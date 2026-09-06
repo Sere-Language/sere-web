@@ -43,12 +43,12 @@ export default function TerminalPanel(
 
   return (
     <div className="relative flex h-full min-h-0 flex-col bg-transparent">
-      <div className="absolute right-2 top-2 z-10 flex items-center gap-0.5 rounded-md border border-white/8 bg-black/30 p-0.5 backdrop-blur-md">
+      <div className="absolute right-2 top-2 z-10 flex items-center gap-0.5 rounded-md border border-border bg-card p-0.5">
         <button
           type="button"
           title="New shell"
           aria-label="New shell"
-          className="inline-flex size-7 items-center justify-center rounded-md text-muted hover:bg-white/10 hover:text-foreground"
+          className="inline-flex size-8 items-center justify-center rounded-md text-muted hover:bg-white/10 hover:text-foreground"
           onClick={openNewShell}
         >
           <WbIcon icon={Plus} className="size-3.5" />
@@ -57,7 +57,7 @@ export default function TerminalPanel(
           type="button"
           title="Reload shell"
           aria-label="Reload shell"
-          className="inline-flex size-7 items-center justify-center rounded-md text-muted hover:bg-white/10 hover:text-foreground"
+          className="inline-flex size-8 items-center justify-center rounded-md text-muted hover:bg-white/10 hover:text-foreground"
           onClick={() => reloadShell(sessionId)}
         >
           <WbIcon icon={ArrowRotateRight} className="size-3.5" />

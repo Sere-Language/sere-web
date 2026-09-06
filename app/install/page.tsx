@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import CloudCtaBand from "../components/CloudCtaBand";
 import Button from "../components/Button";
 import Card from "../components/Card";
 import CodeBlock from "../components/CodeBlock";
@@ -45,7 +44,7 @@ const COMMANDS = [
   { name: "sere --lsp", detail: "Language server on stdin/stdout." },
   { name: "sere --emit-llvm", detail: "Write LLVM IR instead of an executable." },
   { name: "sere --emit-asm", detail: "Write native assembly." },
-  { name: "sere --build-installer", detail: "Package the later Windows setup.exe." },
+  { name: "sere --build-installer", detail: "Package the Windows setup.exe." },
 ] as const;
 
 function Step({
@@ -92,8 +91,8 @@ export default async function InstallPage() {
               Install Sere
             </Heading>
             <Text muted className="fade-up fade-up-delay max-w-2xl">
-              Downloads come from GitHub Releases. Grab a zip, run
-              <code> install.ps1 </code>, and compile. Building from source is
+              Downloads come from GitHub Releases. Run the Windows installer,
+              or grab a portable zip and run <code>install.ps1</code>. Building from source is
               still how you work on the compiler itself.
             </Text>
           </Stack>
@@ -115,7 +114,7 @@ export default async function InstallPage() {
                 </Reveal>
               ) : (
                 <Reveal delay={80}>
-                  <Card>
+                  <Card variant="plain">
                     <Stack gap="sm">
                       <Heading level={3}>From source</Heading>
                       <Text muted className="text-sm leading-6">
@@ -132,7 +131,7 @@ export default async function InstallPage() {
             </Grid>
           ) : (
             <Reveal>
-              <Card>
+              <Card variant="plain">
                 <Stack gap="sm">
                   <Heading level={3}>Releases unavailable</Heading>
                   <Text muted className="text-sm leading-6">
@@ -151,14 +150,14 @@ export default async function InstallPage() {
                 <Button href="#from-source" variant="ghost">
                   Build from source
                 </Button>
-                <Button href="#portable" variant="ghost">
+                <Button href={recommended?.installer ? "#installer" : "#portable"} variant="ghost">
                   Install steps
                 </Button>
               </div>
             </Reveal>
           ) : catalog.latest ? (
             <Reveal>
-              <Button href="#portable" variant="ghost">
+              <Button href={recommended?.installer ? "#installer" : "#portable"} variant="ghost">
                 Install steps
               </Button>
             </Reveal>
@@ -173,7 +172,7 @@ export default async function InstallPage() {
               <Stack gap="sm">
                 <Heading level={2}>Other releases</Heading>
                 <Text muted className="max-w-2xl">
-                  Everything else on GitHub. Prefer the latest zip unless you are
+                  Everything else on GitHub. Prefer the latest release unless you are
                   chasing a specific tag.
                 </Text>
               </Stack>
@@ -210,8 +209,11 @@ export default async function InstallPage() {
                       </p>
                     </div>
                     <div className="flex flex-wrap gap-2">
+                      {release.installer ? (
+                        <Button href={release.installer.url}>Download installer</Button>
+                      ) : null}
                       {release.zip ? (
-                        <Button href={release.zip.url}>Zip</Button>
+                        <Button href={release.zip.url} variant={release.installer ? "ghost" : "primary"}>Zip</Button>
                       ) : null}
                       {release.vsix ? (
                         <Button href={release.vsix.url} variant="ghost">
@@ -291,7 +293,7 @@ sere --version`}
           <Grid cols={2}>
             {REQUIREMENTS.map((item, index) => (
               <Reveal key={item.name} delay={(index % 2) * 80}>
-                <Card>
+                <Card variant="plain">
                   <Stack gap="sm">
                     <Heading level={3}>{item.name}</Heading>
                     <Text muted className="text-sm leading-6">
@@ -361,21 +363,28 @@ cmake --build --preset windows-clang-cl-relwithdebinfo`}
         <Stack gap="lg">
           <Reveal>
             <Stack gap="sm">
-              <Heading level={2}>Inno Setup (later)</Heading>
+              <Heading level={2}>Windows installer</Heading>
               <Text muted className="max-w-2xl">
-                The wizard is a later option. It stages the compiler, stdlib,
-                LLVM 22.1.8, runtime, C API headers, optional Qt6, and the
-                editor VSIX.
+                Download the setup.exe release asset and run it to follow the
+                installation wizard. After installation, open a new terminal
+                and run <code>sere --version</code>.
               </Text>
             </Stack>
           </Reveal>
+          {recommended?.installer ? (
+            <Button href={recommended.installer.url}>Download installer</Button>
+          ) : (
+            <Button href={SERE_RELEASES_PAGE}>Browse installers on GitHub</Button>
+          )}
+          <Text muted className="text-sm">
+            To build the installer from a source checkout:
+          </Text>
           <CodeBlock filename="powershell" wide>
             {`.\\scripts\\bootstrap-innosetup.ps1
 sere --build-installer`}
           </CodeBlock>
           <Text muted className="text-sm">
-            Writes <code>dist/Sere-&lt;version&gt;-setup.exe</code>. Today, use
-            the portable zip.
+            Writes <code>dist/Sere-&lt;version&gt;-setup.exe</code>.
           </Text>
         </Stack>
       </Section>
@@ -403,7 +412,7 @@ deactivate`}
           </CodeBlock>
           <Grid cols={2}>
             <Reveal>
-              <Card>
+              <Card variant="plain">
                 <Stack gap="sm">
                   <Heading level={3}>activate.ps1</Heading>
                   <Text muted className="text-sm leading-6">
@@ -415,7 +424,7 @@ deactivate`}
               </Card>
             </Reveal>
             <Reveal delay={80}>
-              <Card>
+              <Card variant="plain">
                 <Stack gap="sm">
                   <Heading level={3}>deactivate</Heading>
                   <Text muted className="text-sm leading-6">
@@ -498,7 +507,7 @@ sere --emit-asm examples\\hello.sere -o hello.s`}
           <Grid cols={2}>
             {COMMANDS.map((command, index) => (
               <Reveal key={command.name} delay={(index % 2) * 60}>
-                <Card>
+                <Card variant="plain">
                   <Stack gap="sm">
                     <Heading level={3}>
                       <span className="font-mono text-sm">{command.name}</span>
@@ -514,14 +523,6 @@ sere --emit-asm examples\\hello.sere -o hello.s`}
         </Stack>
       </Section>
 
-      <Section>
-        <Reveal>
-          <CloudCtaBand
-            title="Skip the local toolchain"
-            body="Sere Cloud compiles in the browser. Install locally when you want LLVM on the machine."
-          />
-        </Reveal>
-      </Section>
     </Container>
   );
 }

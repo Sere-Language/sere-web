@@ -22,6 +22,16 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
 
+  if (url.origin === self.location.origin) {
+    const skip =
+      url.pathname.startsWith("/api/") ||
+      url.pathname.startsWith("/cloud") ||
+      url.pathname === "/cloud";
+    if (skip) {
+      return;
+    }
+  }
+
   // Direct /sw/PORT/path requests (e.g. iframe src="/nano/sw/8080/")
   if (url.pathname.startsWith(SCOPE_PREFIX)) {
     const rest = url.pathname.slice(SCOPE_PREFIX.length);

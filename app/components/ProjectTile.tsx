@@ -23,7 +23,7 @@ export default function ProjectTile({
   const activityLabel = lastOpened ? "Opened" : "Created";
 
   return (
-    <article className="flex flex-col gap-3 rounded-2xl border border-white/8 bg-card/80 p-4 backdrop-blur-sm transition-colors hover:border-primary/40">
+    <article className="flex flex-col gap-3 rounded-lg border border-border bg-card p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <Link
@@ -45,7 +45,7 @@ export default function ProjectTile({
         {activityLabel} {formatRelativeTime(activityIso)}
       </p>
       <div className="flex items-center gap-2">
-        <Button href={projectPath(project.slug)} className="px-2.5 py-1 text-xs">
+        <Button href={projectPath(project.slug)} variant="secondary" className="text-xs">
           Open
         </Button>
         {onDelete ? (

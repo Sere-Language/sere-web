@@ -13,6 +13,7 @@ import {
 import path from "node:path";
 import { pipeline } from "node:stream/promises";
 import { Readable } from "node:stream";
+import { unzipSync } from "fflate";
 import { getReleaseCatalog, recommendedRelease } from "./release";
 import { isBinaryArtifact, shouldPersistPath } from "./sereInit";
 import type { WorkspaceFile } from "./workspace";
@@ -64,18 +65,30 @@ async function exists(filePath: string): Promise<boolean> {
   }
 }
 
+async function isCompilerBinary(filePath: string): Promise<boolean> {
+  const base = path.basename(filePath).toLowerCase();
+  const parent = path.basename(path.dirname(filePath)).toLowerCase();
+  if (parent !== "bin") {
+    return false;
+  }
+  if (base !== "sere.exe" && base !== "sere") {
+    return false;
+  }
+  try {
+    return (await stat(filePath)).isFile();
+  } catch {
+    return false;
+  }
+}
+
 async function walkForSere(root: string, depth = 0): Promise<string | null> {
-  if (depth > 6) {
+  if (depth > 8) {
     return null;
   }
-  const names = ["sere.exe", "sere"];
-  for (const name of names) {
-    const candidate = path.join(root, name);
-    if (await exists(candidate)) {
-      return candidate;
-    }
+  const preferred = process.platform === "win32" ? ["sere.exe", "sere"] : ["sere", "sere.exe"];
+  for (const name of preferred) {
     const inBin = path.join(root, "bin", name);
-    if (await exists(inBin)) {
+    if (await isCompilerBinary(inBin)) {
       return inBin;
     }
   }
@@ -85,11 +98,23 @@ async function walkForSere(root: string, depth = 0): Promise<string | null> {
   } catch {
     return null;
   }
+  const skip = new Set(["include", "stdlib", "docs", "share", "lib", "lib64"]);
+  entries.sort((left, right) => {
+    if (left === "bin") {
+      return -1;
+    }
+    if (right === "bin") {
+      return 1;
+    }
+    return left.localeCompare(right);
+  });
   for (const entry of entries) {
+    if (skip.has(entry.toLowerCase())) {
+      continue;
+    }
     const full = path.join(root, entry);
     try {
-      const info = await stat(full);
-      if (info.isDirectory()) {
+      if ((await stat(full)).isDirectory()) {
         const found = await walkForSere(full, depth + 1);
         if (found) {
           return found;
@@ -103,19 +128,31 @@ async function walkForSere(root: string, depth = 0): Promise<string | null> {
 }
 
 async function printEnv(compiler: string): Promise<SereEnv> {
-  const { stdout } = await execFileAsync(compiler, ["--print-env"], {
-    windowsHide: true,
-    timeout: 20_000,
-  });
-  const parsed = JSON.parse(stdout) as Partial<SereEnv>;
-  const compilerPath = parsed.compiler ?? compiler;
-  return {
-    compiler: compilerPath,
-    compilerDir: parsed.compilerDir ?? path.dirname(compilerPath),
-    llvmBin: parsed.llvmBin ?? path.dirname(compilerPath),
-    stdlib: parsed.stdlib ?? "",
-    version: parsed.version ?? "dev",
-  };
+  try {
+    const { stdout } = await execFileAsync(compiler, ["--print-env"], {
+      windowsHide: true,
+      timeout: 20_000,
+    });
+    const parsed = JSON.parse(stdout) as Partial<SereEnv>;
+    const compilerPath = parsed.compiler ?? compiler;
+    return {
+      compiler: compilerPath,
+      compilerDir: parsed.compilerDir ?? path.dirname(compilerPath),
+      llvmBin: parsed.llvmBin ?? path.dirname(compilerPath),
+      stdlib: parsed.stdlib ?? "",
+      version: parsed.version ?? "dev",
+    };
+  } catch {
+    const compilerDir = path.dirname(compiler);
+    const home = path.basename(compilerDir).toLowerCase() === "bin" ? path.dirname(compilerDir) : compilerDir;
+    return {
+      compiler,
+      compilerDir,
+      llvmBin: compilerDir,
+      stdlib: path.join(home, "stdlib"),
+      version: "dev",
+    };
+  }
 }
 
 async function findLocalCompiler(): Promise<string | null> {
@@ -127,8 +164,15 @@ async function findLocalCompiler(): Promise<string | null> {
   ].filter(Boolean);
 
   for (const candidate of candidates) {
-    if (candidate && (await exists(candidate))) {
-      return candidate;
+    if (!candidate) {
+      continue;
+    }
+    try {
+      if ((await stat(candidate)).isFile()) {
+        return candidate;
+      }
+    } catch {
+      // Missing.
     }
   }
 
@@ -139,8 +183,14 @@ async function findLocalCompiler(): Promise<string | null> {
       timeout: 10_000,
     });
     const first = stdout.split(/\r?\n/).map((line) => line.trim()).find(Boolean);
-    if (first && (await exists(first))) {
-      return first;
+    if (first) {
+      try {
+        if ((await stat(first)).isFile()) {
+          return first;
+        }
+      } catch {
+        // Missing.
+      }
     }
   } catch {
     // Not on PATH.
@@ -149,8 +199,23 @@ async function findLocalCompiler(): Promise<string | null> {
   return null;
 }
 
+function githubDownloadHeaders(): Record<string, string> {
+  const headers: Record<string, string> = {
+    "User-Agent": "sere-web",
+    Accept: "application/octet-stream",
+  };
+  const token = process.env.GITHUB_TOKEN;
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+  return headers;
+}
+
 async function downloadZip(url: string, dest: string): Promise<void> {
-  const response = await fetch(url, { redirect: "follow" });
+  const response = await fetch(url, {
+    redirect: "follow",
+    headers: githubDownloadHeaders(),
+  });
   if (!response.ok || !response.body) {
     throw new Error(`Could not download toolchain (${response.status}).`);
   }
@@ -162,40 +227,71 @@ async function downloadZip(url: string, dest: string): Promise<void> {
 
 async function extractZip(zipPath: string, dest: string): Promise<void> {
   await mkdir(dest, { recursive: true });
-  await execFileAsync("tar", ["-xf", zipPath, "-C", dest], {
-    windowsHide: true,
-    timeout: 120_000,
-  });
+  const bytes = await readFile(zipPath);
+  const files = unzipSync(bytes);
+  for (const [name, data] of Object.entries(files)) {
+    const relative = name.replaceAll("\\", "/");
+    if (!relative || relative.endsWith("/")) {
+      continue;
+    }
+    const out = path.join(dest, ...relative.split("/"));
+    await mkdir(path.dirname(out), { recursive: true });
+    await writeFile(out, data);
+  }
+}
+
+async function installZip(tag: string, url: string): Promise<SereEnv> {
+  const dest = path.join(HOST_ROOT, "toolchains", tag);
+  const ready = path.join(dest, ".ready");
+  if (await exists(ready)) {
+    const compiler = await walkForSere(dest);
+    if (compiler) {
+      return printEnv(compiler);
+    }
+    await rm(dest, { recursive: true, force: true });
+  }
+
+  await mkdir(HOST_ROOT, { recursive: true });
+  const zipPath = path.join(HOST_ROOT, `${tag}.zip`);
+  await downloadZip(url, zipPath);
+  await rm(dest, { recursive: true, force: true });
+  try {
+    await extractZip(zipPath, dest);
+  } finally {
+    await rm(zipPath, { force: true });
+  }
+  const compiler = await walkForSere(dest);
+  if (!compiler) {
+    throw new Error("The GitHub zip did not contain bin/sere.exe.");
+  }
+  await writeFile(ready, `${tag}\n`, "utf8");
+  return printEnv(compiler);
 }
 
 async function installFromGithub(): Promise<SereEnv> {
   const catalog = await getReleaseCatalog();
-  const release = recommendedRelease(catalog);
-  if (!release?.zip?.url) {
-    throw new Error("No GitHub toolchain zip was listed for this release.");
-  }
-
-  const dest = path.join(HOST_ROOT, "toolchains", release.tag);
-  const ready = path.join(dest, ".ready");
-  if (await exists(ready)) {
-    const compiler = await walkForSere(dest);
-    if (!compiler) {
-      throw new Error("Cached toolchain is missing sere.");
+  const ordered = [
+    recommendedRelease(catalog),
+    ...(catalog.all ?? []),
+  ].filter((release, index, list): release is NonNullable<typeof release> => {
+    if (!release?.zip?.url) {
+      return false;
     }
-    return printEnv(compiler);
+    return list.findIndex((item) => item?.tag === release.tag) === index;
+  });
+  if (ordered.length === 0) {
+    throw new Error("No Windows toolchain zip was listed on GitHub.");
   }
 
-  await mkdir(HOST_ROOT, { recursive: true });
-  const zipPath = path.join(HOST_ROOT, `${release.tag}.zip`);
-  await downloadZip(release.zip.url, zipPath);
-  await rm(dest, { recursive: true, force: true });
-  await extractZip(zipPath, dest);
-  const compiler = await walkForSere(dest);
-  if (!compiler) {
-    throw new Error("The GitHub zip did not contain sere.");
+  let lastError = "No Windows toolchain zip was listed on GitHub.";
+  for (const release of ordered) {
+    try {
+      return await installZip(release.tag, release.zip!.url);
+    } catch (caught) {
+      lastError = caught instanceof Error ? caught.message : lastError;
+    }
   }
-  await writeFile(ready, `${release.tag}\n`, "utf8");
-  return printEnv(compiler);
+  throw new Error(lastError);
 }
 
 export async function bootCompilerHost(): Promise<HostBootResult> {
@@ -378,8 +474,15 @@ export function hostEnv(env: SereEnv): NodeJS.ProcessEnv {
     ...process.env,
     [pathKey]: joined,
     PATH: joined,
-    SERE_HOME: env.compilerDir,
-    SERE_STDLIB: env.stdlib,
+    SERE_HOME: path.basename(env.compilerDir).toLowerCase() === "bin"
+      ? path.dirname(env.compilerDir)
+      : env.compilerDir,
+    SERE_STDLIB: env.stdlib || path.join(
+      path.basename(env.compilerDir).toLowerCase() === "bin"
+        ? path.dirname(env.compilerDir)
+        : env.compilerDir,
+      "stdlib",
+    ),
     SERE_ACTIVE: "1",
     TERM: "xterm-256color",
     FORCE_COLOR: "1",

@@ -8,11 +8,11 @@ interface DocsPagerProps {
 
 export default function DocsPager({ prev, next }: DocsPagerProps) {
   return (
-    <div className="mt-14 grid grid-cols-1 gap-3 border-t border-border pt-8 sm:grid-cols-2">
+    <nav aria-label="Documentation pages" className="mt-14 grid grid-cols-1 gap-3 border-t border-border pt-8 sm:grid-cols-2">
       {prev ? (
         <Link
           href={prev.href}
-          className="rounded-lg border border-border bg-card/80 px-4 py-3 no-underline transition-colors hover:border-primary/35 hover:no-underline"
+          className="rounded-lg border border-border bg-card px-4 py-3 no-underline transition-colors hover:border-muted hover:no-underline"
         >
           <div className="text-xs text-muted">Previous</div>
           <div className="mt-1 text-sm text-foreground">{prev.title}</div>
@@ -23,12 +23,12 @@ export default function DocsPager({ prev, next }: DocsPagerProps) {
       {next ? (
         <Link
           href={next.href}
-          className="rounded-lg border border-border bg-card/80 px-4 py-3 text-right no-underline transition-colors hover:border-primary/35 hover:no-underline sm:justify-self-end sm:text-right"
+          className="rounded-lg border border-border bg-card px-4 py-3 text-right no-underline transition-colors hover:border-muted hover:no-underline sm:justify-self-end sm:text-right"
         >
           <div className="text-xs text-muted">Next</div>
           <div className="mt-1 text-sm text-foreground">{next.title}</div>
         </Link>
       ) : null}
-    </div>
+    </nav>
   );
 }

@@ -29,13 +29,15 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
+      lang="en"
       className={`dark ${geistSans.variable} ${geistMono.variable}`}
       data-theme="dark"
       data-scroll-behavior="smooth"
     >
       <body>
+        <a href="#main-content" className="skip-link">Skip to content</a>
         <SiteNavbar />
-        {children}
+        <main id="main-content" tabIndex={-1}>{children}</main>
         <Footer />
       </body>
     </html>

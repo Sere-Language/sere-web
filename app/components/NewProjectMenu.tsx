@@ -33,9 +33,10 @@ function FilterChip({
     <button
       type="button"
       onClick={onClick}
-      className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+      aria-pressed={active}
+      className={`rounded-md px-3 py-2 text-xs font-medium transition-colors ${
         active
-          ? "bg-primary/15 text-primary-hover"
+          ? "bg-secondary text-foreground"
           : "text-muted hover:bg-secondary hover:text-foreground"
       }`}
     >
@@ -141,13 +142,13 @@ export default function NewProjectMenu() {
         </div>
       </div>
 
-      {listError ? <Text className="text-sm text-danger">{listError}</Text> : null}
+      {listError ? <p role="alert" className="m-0 text-sm text-danger">{listError}</p> : null}
 
       {!loaded ? (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          <div className="h-36 rounded-lg border border-border bg-card/50" />
-          <div className="h-36 rounded-lg border border-border bg-card/50" />
-          <div className="h-36 rounded-lg border border-border bg-card/50" />
+          <div className="h-36 rounded-lg border border-border bg-card" />
+          <div className="h-36 rounded-lg border border-border bg-card" />
+          <div className="h-36 rounded-lg border border-border bg-card" />
         </div>
       ) : null}
 

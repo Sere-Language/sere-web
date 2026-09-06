@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import CloudCtaBand from "../components/CloudCtaBand";
 import Button from "../components/Button";
 import Card from "../components/Card";
 import Grid from "../components/Grid";
@@ -11,48 +10,40 @@ import Text from "../components/Text";
 
 export const metadata: Metadata = {
   title: "Community — Sere",
-  description: "Talk about Sere, report issues, and follow the project.",
+  description: "Follow releases, file issues, and talk through design in the open.",
 };
 
 export default function CommunityPage() {
   return (
     <PageIntro
-      eyebrow="Together"
+      eyebrow="Open work"
       title="Community"
-      description="Sere is built in the open. Use the repo to follow releases, file issues, and talk through design."
+      description="The compiler, stdlib, examples, and this site all live in one repository. File issues there, read the release notes, and join the design conversations."
     >
       <Grid cols={2}>
         <Reveal>
-          <Card>
+          <Card variant="elevated">
             <Stack gap="sm">
-              <Heading level={3}>GitHub</Heading>
+              <Heading level={3}>GitHub repository</Heading>
               <Text muted className="text-sm leading-6">
-                Source, examples, and the compiler live in one repository.
+                Source, examples, and the compiler share one repository. Releases, issues, and pull requests all live there.
               </Text>
-              <Button href="https://github.com/Sere-Language/sere">Open the repo</Button>
+              <Button href="https://github.com/Sere-Language/sere" size="sm">Open the repo</Button>
             </Stack>
           </Card>
         </Reveal>
         <Reveal delay={80}>
-          <Card>
+          <Card variant="elevated">
             <Stack gap="sm">
-              <Heading level={3}>Issues</Heading>
+              <Heading level={3}>Issues & discussions</Heading>
               <Text muted className="text-sm leading-6">
-                Bugs, language questions, and feature requests go on the tracker.
+                Bugs, language questions, and feature requests go on the issue tracker. Use it for anything that is not a private matter.
               </Text>
-              <Button href="https://github.com/Sere-Language/sere/issues" variant="ghost">
-                View issues
-              </Button>
+              <Button href="https://github.com/Sere-Language/sere/issues" variant="secondary" size="sm">View issues</Button>
             </Stack>
           </Card>
         </Reveal>
       </Grid>
-      <Reveal>
-        <CloudCtaBand
-          title="Talk is cheap. Compile it."
-          body="Spin up a cloud workspace and try the language while you follow the repo."
-        />
-      </Reveal>
     </PageIntro>
   );
 }

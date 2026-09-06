@@ -7,9 +7,7 @@ interface NavbarButtonProps {
   href: string;
   exact?: boolean;
   children: React.ReactNode;
-}
-
-export default function NavbarButton({ href, exact = false, children }: NavbarButtonProps) {
+}export default function NavbarButton({ href, exact = false, children }: NavbarButtonProps) {
   const pathname = usePathname();
   const active = exact
     ? pathname === href
@@ -18,10 +16,11 @@ export default function NavbarButton({ href, exact = false, children }: NavbarBu
   return (
     <Link
       href={href}
-      className={`rounded-md px-3 py-1.5 text-sm no-underline transition-colors hover:no-underline ${
+      aria-current={active ? "page" : undefined}
+      className={`shrink-0 whitespace-nowrap rounded-md px-2.5 py-2 sm:px-3.5 text-sm no-underline transition-all duration-150 hover:no-underline ${
         active
-          ? "bg-primary/10 text-primary"
-          : "text-muted hover:bg-primary/10 hover:text-primary"
+          ? "bg-secondary border border-secondary-border text-foreground shadow-sm"
+          : "text-muted hover:border-border hover:bg-secondary hover:text-foreground hover:shadow-xs hover:-translate-y-0.5 active:translate-y-0"
       }`}
     >
       {children}

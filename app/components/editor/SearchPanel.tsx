@@ -21,12 +21,12 @@ export default function SearchPanel() {
           onChange={(event) => setQuery(event.target.value)}
           placeholder="Search in files"
           aria-label="Search in files"
-          className="w-full rounded-md border border-white/8 bg-white/4 px-2.5 py-1.5 text-[12px] text-foreground outline-none"
+          className="w-full rounded-md border border-border bg-background px-2.5 py-1.5 text-[12px] text-foreground outline-none"
         />
       </div>
       <ul className="m-0 min-h-0 flex-1 list-none overflow-auto p-1">
         {query.trim() && hits.length === 0 ? (
-          <li className="px-3 py-2 text-[12px] text-muted">No matches</li>
+          <li role="status" className="px-3 py-2 text-[12px] text-muted">No matches</li>
         ) : null}
         {hits.map((hit) => (
           <li key={`${hit.path}:${hit.line}:${hit.text.slice(0, 24)}`}>

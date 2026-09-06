@@ -20,7 +20,7 @@ export default function DocsSidebar({ docs }: DocsSidebarProps) {
       </label>
       <select
         id="docs-jump"
-        className="mb-6 w-full px-3 py-2 text-sm md:hidden"
+        className="w-full px-3 py-2 text-sm bg-card border border-border rounded-md shadow-sm md:hidden"
         value={pathname}
         onChange={(event) => router.push(event.target.value)}
       >
@@ -31,24 +31,25 @@ export default function DocsSidebar({ docs }: DocsSidebarProps) {
         ))}
       </select>
 
-      <nav className="hidden md:block">
+      <nav aria-label="Documentation" className="hidden md:block">
         <div className="mb-4 flex items-center gap-2">
-          <BrandMark size={22} />
+          <BrandMark alt="" size={22} />
           <p className="m-0 text-xs font-medium uppercase tracking-wider text-muted">
             Language
           </p>
         </div>
-        <ul className="flex flex-col gap-0.5">
+        <ul className="flex flex-col gap-0.5 border-l border-border pl-3">
           {docs.map((doc) => {
             const active = pathname === doc.href;
             return (
               <li key={doc.slug}>
                 <Link
                   href={doc.href}
-                  className={`block rounded-md px-2.5 py-1.5 text-sm no-underline transition-colors hover:no-underline ${
+                  aria-current={active ? "page" : undefined}
+                  className={`block rounded-md px-2.5 py-1.5 text-sm no-underline transition-all duration-200 hover:no-underline ${
                     active
-                      ? "bg-primary/10 text-primary"
-                      : "text-muted hover:bg-primary/10 hover:text-foreground"
+                      ? "bg-secondary text-foreground border-l-2 border-primary pl-3"
+                      : "text-muted hover:bg-secondary hover:text-foreground hover:pl-4"
                   }`}
                 >
                   {doc.title}

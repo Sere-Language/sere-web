@@ -19,7 +19,8 @@ export default function MenuBar({ label, children }: MenuBarProps) {
       return;
     }
     const rect = buttonRef.current.getBoundingClientRect();
-    setPos({ top: rect.bottom + 6, left: rect.left });
+    setPos({ top: rect.bottom + 4, left: Math.max(8, Math.min(rect.left, window.innerWidth - 224)) });
+    menuRef.current?.querySelector<HTMLButtonElement>("button:not(:disabled)")?.focus();
   }, [open]);
 
   useEffect(() => {
@@ -38,6 +39,7 @@ export default function MenuBar({ label, children }: MenuBarProps) {
     function onKey(event: KeyboardEvent) {
       if (event.key === "Escape") {
         setOpen(false);
+        buttonRef.current?.focus();
       }
     }
 
@@ -62,7 +64,8 @@ export default function MenuBar({ label, children }: MenuBarProps) {
       <button
         ref={buttonRef}
         type="button"
-        className={`rounded-md px-2.5 py-1 text-[12px] ${
+        aria-expanded={open}
+        className={`min-h-8 rounded-md px-2.5 py-1 text-[12px] ${
           open ? "bg-white/10 text-foreground" : "text-muted hover:bg-white/6 hover:text-foreground"
         }`}
         onClick={() => setOpen((current) => !current)}
@@ -73,7 +76,7 @@ export default function MenuBar({ label, children }: MenuBarProps) {
         ? createPortal(
             <div
               ref={menuRef}
-              className="fixed z-[200] min-w-52 rounded-lg border border-white/10 bg-[#141618]/95 p-1 shadow-[0_12px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl"
+              className="fixed z-[200] max-h-[70vh] min-w-52 max-w-[calc(100vw-1rem)] overflow-auto rounded-md border border-border bg-card p-1 shadow-lg"
               style={{ top: pos.top, left: pos.left }}
               onClick={() => setOpen(false)}
             >
@@ -99,7 +102,8 @@ export function MenuItem({ children, disabled, danger, checked, onClick }: MenuI
     <button
       type="button"
       disabled={disabled}
-      className={`flex w-full items-center gap-2 rounded-md px-3 py-1.5 text-left text-[12px] disabled:cursor-not-allowed disabled:opacity-40 ${
+      aria-pressed={checked}
+      className={`flex min-h-8 w-full items-center gap-2 rounded px-3 py-1.5 text-left text-[12px] disabled:cursor-not-allowed disabled:opacity-40 ${
         danger ? "text-danger hover:bg-danger/10" : "text-foreground hover:bg-white/6"
       }`}
       onClick={onClick}

@@ -73,7 +73,9 @@ export default function CommandPalette({
   const items = mode === "files" ? fileItems : commandItems;
 
   useEffect(() => {
+    const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     inputRef.current?.focus();
+    return () => previousFocus?.focus();
   }, []);
 
   useEffect(() => {
@@ -96,21 +98,47 @@ export default function CommandPalette({
 
   return (
     <div
-      className="fixed inset-0 z-300 flex items-start justify-center bg-black/50 px-4 pt-[18vh] backdrop-blur-sm"
+      className="fixed inset-0 z-300 flex items-start justify-center bg-black/50 px-4 pt-[18vh]"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) {
           onClose();
         }
       }}
     >
-      <div className="w-full max-w-xl overflow-hidden rounded-xl border border-white/10 bg-[#141618] shadow-[0_24px_80px_rgba(0,0,0,0.55)]">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={mode === "files" ? "Open file" : "Run command"}
+        onKeyDown={(event) => {
+          if (event.key === "Escape") {
+            event.preventDefault();
+            event.stopPropagation();
+            onClose();
+          }
+          if (event.key === "Tab") {
+            const controls = Array.from(event.currentTarget.querySelectorAll<HTMLElement>("input, button"));
+            const first = controls[0];
+            const last = controls[controls.length - 1];
+            if (event.shiftKey && document.activeElement === first) {
+              event.preventDefault();
+              last?.focus();
+            } else if (!event.shiftKey && document.activeElement === last) {
+              event.preventDefault();
+              first?.focus();
+            }
+          }
+        }}
+        className="w-full max-w-xl overflow-hidden rounded-lg border border-border bg-card shadow-lg"
+      >
         <input
           ref={inputRef}
+          aria-label={mode === "files" ? "Search files" : "Search commands"}
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           onKeyDown={(event) => {
             if (event.key === "Escape") {
               event.preventDefault();
+              event.stopPropagation();
               onClose();
               return;
             }
@@ -140,7 +168,7 @@ export default function CommandPalette({
               <li key={item.id}>
                 <button
                   type="button"
-                  className={`flex w-full rounded-lg px-3 py-2 text-left text-[13px] ${
+                  className={`flex min-h-9 w-full rounded-md px-3 py-2 text-left text-[13px] ${
                     index === active ? "bg-white/10 text-foreground" : "text-muted hover:bg-white/6"
                   }`}
                   onMouseEnter={() => setActive(index)}

@@ -42,11 +42,14 @@ export default function ReleaseCard({
           {zipSize ? ` · ${zipSize}` : ""}
         </Text>
         <div className="flex flex-wrap gap-2">
+          {release.installer ? (
+            <Button href={release.installer.url}>Download installer</Button>
+          ) : null}
           {release.zip ? (
-            <Button href={release.zip.url}>Download zip</Button>
-          ) : (
+            <Button href={release.zip.url} variant={release.installer ? "ghost" : "primary"}>Download zip</Button>
+          ) : !release.installer ? (
             <Button href={release.pageUrl}>View on GitHub</Button>
-          )}
+          ) : null}
           {release.vsix ? (
             <Button href={release.vsix.url} variant="ghost">
               VSIX

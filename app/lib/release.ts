@@ -16,6 +16,7 @@ export type SereRelease = {
   stable: boolean;
   publishedAt: string | null;
   pageUrl: string;
+  installer: ReleaseAsset | null;
   zip: ReleaseAsset | null;
   linuxZip: ReleaseAsset | null;
   vsix: ReleaseAsset | null;
@@ -66,6 +67,10 @@ function toSereRelease(release: GithubRelease): SereRelease {
     stable: !release.prerelease,
     publishedAt: release.published_at,
     pageUrl: release.html_url,
+    installer: pickAsset(
+      release.assets,
+      (assetName) => assetName.endsWith(".exe") && /setup|install/.test(assetName),
+    ),
     zip: pickAsset(
       release.assets,
       (assetName) =>
@@ -141,25 +146,37 @@ export async function getReleaseCatalog(): Promise<ReleaseCatalog> {
 
     const response = await fetch(RELEASES_API, {
       headers,
-      next: { revalidate: 300 },
+      next: { revalidate: 300, tags: ["releases"] },
     });
-    if (!response.ok) return empty;
+    if (!response.ok) {
+      // Retry once — GitHub occasionally hiccups or briefly rate-limits.
+      // Don't cache the failure so the next request can succeed.
+      const retry = await fetch(RELEASES_API, {
+        headers,
+        cache: "no-store",
+      });
+      if (!retry.ok) return empty;
+      return parseReleases((await retry.json()) as GithubRelease[]);
+    }
 
-    const payload = (await response.json()) as GithubRelease[];
-    const all = payload
-      .filter((release) => !release.draft)
-      .map(toSereRelease)
-      .sort((a, b) => publishedTime(b) - publishedTime(a));
-
-    const latest = all[0] ?? null;
-    const latestStable = all.find((release) => release.stable) ?? null;
-    const featuredTags = new Set(
-      [latest?.tag, latestStable?.tag].filter((tag): tag is string => Boolean(tag)),
-    );
-    const others = all.filter((release) => !featuredTags.has(release.tag));
-
-    return { latest, latestStable, others, all };
+    return parseReleases((await response.json()) as GithubRelease[]);
   } catch {
     return empty;
   }
+}
+
+function parseReleases(payload: GithubRelease[]): ReleaseCatalog {
+  const all = payload
+    .filter((release) => !release.draft)
+    .map(toSereRelease)
+    .sort((a, b) => publishedTime(b) - publishedTime(a));
+
+  const latest = all[0] ?? null;
+  const latestStable = all.find((release) => release.stable) ?? null;
+  const featuredTags = new Set(
+    [latest?.tag, latestStable?.tag].filter((tag): tag is string => Boolean(tag)),
+  );
+  const others = all.filter((release) => !featuredTags.has(release.tag));
+
+  return { latest, latestStable, others, all };
 }

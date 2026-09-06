@@ -2,11 +2,13 @@ import Link from "next/link";
 
 const VARIANT_CLASS = {
   primary:
-    "bg-primary text-primary-foreground no-underline hover:bg-primary-hover hover:text-primary-foreground hover:no-underline",
+    "btn btn-primary",
+  secondary:
+    "btn btn-secondary",
   ghost:
-    "text-muted no-underline hover:bg-primary/10 hover:text-primary hover:no-underline",
+    "btn btn-ghost",
   danger:
-    "bg-danger text-white no-underline hover:bg-danger/85 hover:text-white hover:no-underline",
+    "btn bg-danger text-background shadow-md hover:bg-danger/90 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-inset-sm active:brightness-95 transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none",
 } as const;
 
 interface ButtonProps {
@@ -17,6 +19,7 @@ interface ButtonProps {
   children: React.ReactNode;
   disabled?: boolean;
   onClick?: () => void;
+  size?: "sm" | "md" | "lg";
 }
 
 export default function Button({
@@ -27,8 +30,15 @@ export default function Button({
   children,
   disabled = false,
   onClick,
+  size = "md",
 }: ButtonProps) {
-  const classes = `inline-flex items-center rounded-md px-3.5 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${VARIANT_CLASS[variant]} ${className ?? ""}`;
+  const sizeClasses = {
+    sm: "btn-sm",
+    md: "btn-md",
+    lg: "btn-lg",
+  }[size];
+  
+  const classes = `inline-flex w-fit justify-center items-center gap-2 rounded-md font-medium ${sizeClasses} ${VARIANT_CLASS[variant]} ${className ?? ""}`;
 
   if (href) {
     return (

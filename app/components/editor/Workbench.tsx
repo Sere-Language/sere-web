@@ -167,7 +167,7 @@ function StatusBar() {
   }, []);
 
   return (
-    <div className="relative z-50 flex h-8 shrink-0 items-center justify-between gap-4 border-t border-white/6 bg-[#0c0e10]/80 px-4 text-[11px] text-muted backdrop-blur-xl">
+    <div className="relative z-50 flex h-8 shrink-0 items-center justify-between gap-4 overflow-x-auto border-t border-border bg-background px-4 text-[11px] whitespace-nowrap text-muted">
       <span className="flex min-w-0 items-center gap-2">
         <span
           className={`size-1.5 shrink-0 rounded-full ${busy ? "bg-warning" : dirty ? "bg-warning" : "bg-success"}`}

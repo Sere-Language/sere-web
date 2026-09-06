@@ -11,7 +11,7 @@ export default function TryInCloudButton({ className }: { className?: string }) 
   return (
     <Button
       href={href}
-      className={`px-4 py-2 shadow-[0_0_28px_-6px_rgba(194,82,72,0.85)] ${className ?? ""}`}
+      className={`px-4 py-2 ${className ?? ""}`}
     >
       {label}
     </Button>

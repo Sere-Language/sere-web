@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import CloudCtaBand from "../components/CloudCtaBand";
 import Button from "../components/Button";
 import Card from "../components/Card";
 import CodeBlock from "../components/CodeBlock";
@@ -49,13 +48,13 @@ export default function LibrariesPage() {
             </Text>
           </Stack>
         </Reveal>
-        <CodeBlock filename="powershell" wide quiet>
+        <CodeBlock filename="powershell" wide>
           {`sere init-lib mathlib
 cd mathlib
 sere pack
 copy dist\\mathlib.slib ..\\myapp\\libs\\`}
         </CodeBlock>
-        <CodeBlock filename="main.sere" wide quiet>
+        <CodeBlock filename="main.sere" wide>
           {highlightSere(`import mathlib
 
 def main() -> i32:
@@ -63,7 +62,7 @@ def main() -> i32:
         </CodeBlock>
         <Grid cols={2}>
           <Reveal>
-            <Card>
+            <Card variant="panel">
               <Stack gap="sm">
                 <Heading level={3}>What gets packed</Heading>
                 <Text muted className="text-sm leading-6">
@@ -74,7 +73,7 @@ def main() -> i32:
             </Card>
           </Reveal>
           <Reveal delay={80}>
-            <Card>
+            <Card variant="panel">
               <Stack gap="sm">
                 <Heading level={3}>Folder form</Heading>
                 <Text muted className="text-sm leading-6">
@@ -86,17 +85,12 @@ def main() -> i32:
             </Card>
           </Reveal>
         </Grid>
-        <Button href="/docs/libraries">Libraries in the docs</Button>
+        <Button href="/docs/libraries" variant="secondary" className="mt-4">
+          Libraries in the docs
+        </Button>
       </Stack>
 
-      <Reveal>
-        <CloudCtaBand
-          title="Drop a .slib in the cloud"
-          body="Create a library workspace, pack it, and import it from another project — all in the browser."
-        />
-      </Reveal>
-
-      <Stack gap="lg">
+      <Stack gap="lg" className="mt-12">
         <Reveal>
           <Stack gap="sm">
             <Heading level={2}>Standard library</Heading>
@@ -105,10 +99,10 @@ def main() -> i32:
             </Text>
           </Stack>
         </Reveal>
-        <Grid cols={2}>
+        <Grid cols={3}>
           {MODULES.map((mod, index) => (
-            <Reveal key={mod.name} delay={(index % 2) * 80}>
-              <Card>
+            <Reveal key={mod.name} delay={(index % 3) * 80}>
+              <Card variant="elevated">
                 <Stack gap="sm">
                   <Heading level={3}>{mod.name}</Heading>
                   <Text muted className="text-sm leading-6">

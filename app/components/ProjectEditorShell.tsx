@@ -57,10 +57,10 @@ export default function ProjectEditorShell({ slug }: ProjectEditorShellProps) {
   }, [slug]);
 
   return (
-    <div className="flex h-[calc(100svh-3rem)] min-h-0 flex-col bg-[#0c0e10]">
+    <div className="flex h-[calc(100svh-3rem)] min-h-0 flex-col bg-background">
       {error ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-3 px-6 text-center">
-          <p className="m-0 text-lg font-semibold tracking-tight">{error}</p>
+          <p role="alert" className="m-0 text-lg font-semibold tracking-tight">{error}</p>
           <p className="m-0 max-w-sm text-sm text-muted">
             This workspace is missing, or you do not have access.
           </p>

@@ -1,5 +1,5 @@
 const LEVEL_CLASS = {
-  1: "text-5xl font-semibold tracking-tight leading-[1.1] sm:text-6xl",
+  1: "heading-1 font-semibold tracking-tight leading-[1.12]",
   2: "text-2xl font-semibold tracking-tight",
   3: "text-lg font-semibold tracking-tight",
 } as const;

@@ -9,7 +9,6 @@ import {
   type ProjectKind,
 } from "@/app/lib/projects";
 import Button from "./Button";
-import Card from "./Card";
 import CloudSnapshot from "./CloudSnapshot";
 import CreateProjectDialog from "./CreateProjectDialog";
 import Grid from "./Grid";
@@ -86,28 +85,23 @@ export default function CloudOverview() {
 
   return (
     <Stack gap="lg">
-      <div className="relative overflow-hidden pb-2 text-center sm:text-left">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute left-1/2 top-0 h-64 w-[36rem] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(194,82,72,0.28),transparent_68%)] blur-2xl sm:left-0 sm:translate-x-0"
-        />
-        <div className="relative flex flex-col items-center gap-6 sm:items-start">
-          <p className="m-0 text-[11px] font-medium uppercase tracking-[0.22em] text-primary">
+      <div className="relative overflow-hidden pb-2 text-left">
+        <div className="relative flex flex-col items-start gap-5">
+          <p className="m-0 text-xs font-medium uppercase tracking-wider text-primary">
             Sere Cloud
           </p>
-          <Heading className="max-w-3xl text-4xl sm:text-6xl">
+          <Heading className="max-w-3xl">
             The workbench,
             <br />
             <span className="hero-compiled">in the browser.</span>
           </Heading>
           <Text muted className="max-w-xl text-base leading-7">
-            Edit, compile, and run Sere without installing the toolchain. Monaco
-            on the left, NanoVM in the terminal, LLVM IR on the right.
+            Edit, compile, and run Sere without installing the toolchain. Your files, terminal, and compiler output share one workspace.
           </Text>
           {!ready ? <div className="h-10 w-56" aria-hidden /> : null}
           {ready && signedIn ? (
-            <div className="flex flex-wrap justify-center gap-3 sm:justify-start">
-              <Button href="/cloud/dashboard" className="px-4 py-2 shadow-[0_0_28px_-6px_rgba(194,82,72,0.85)]">
+            <div className="flex flex-wrap justify-start gap-3">
+              <Button href="/cloud/dashboard" className="px-4 py-2">
                 Open dashboard
               </Button>
               <Button variant="ghost" className="px-4 py-2" onClick={() => setCreateKind("app")}>
@@ -116,8 +110,8 @@ export default function CloudOverview() {
             </div>
           ) : null}
           {ready && !signedIn ? (
-            <div className="flex flex-wrap justify-center gap-3 sm:justify-start">
-              <Button href="/cloud/auth/signup" className="px-4 py-2 shadow-[0_0_28px_-6px_rgba(194,82,72,0.85)]">
+            <div className="flex flex-wrap justify-start gap-3">
+              <Button href="/cloud/auth/signup" className="px-4 py-2">
                 Sign up free
               </Button>
               <Button href="/cloud/auth/login" variant="ghost" className="px-4 py-2">
@@ -162,7 +156,7 @@ export default function CloudOverview() {
       <Grid cols={3}>
         {FEATURES.map((feature, index) => (
           <Reveal key={feature.title} delay={index * 80}>
-            <Card className="relative overflow-hidden before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-primary/80 before:to-transparent">
+            <div className="border-t border-border pt-5">
               <Stack gap="sm">
                 <p className="m-0 font-mono text-[11px] text-primary">{feature.kicker}</p>
                 <Heading level={3}>{feature.title}</Heading>
@@ -170,14 +164,14 @@ export default function CloudOverview() {
                   {feature.body}
                 </Text>
               </Stack>
-            </Card>
+            </div>
           </Reveal>
         ))}
       </Grid>
 
-      <div className="grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-px border-y border-border bg-border sm:grid-cols-3">
         {STEPS.map((item) => (
-          <div key={item.step} className="bg-card/90 px-5 py-6 backdrop-blur-sm">
+          <div key={item.step} className="bg-card px-5 py-6">
             <p className="m-0 font-mono text-[11px] text-primary">{item.step}</p>
             <p className="m-0 mt-2 text-sm font-semibold tracking-tight">{item.title}</p>
             <p className="m-0 mt-1 text-xs leading-5 text-muted">{item.body}</p>

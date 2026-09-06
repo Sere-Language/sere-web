@@ -4,7 +4,7 @@ export default function DocToc({ headings }: { headings: DocHeading[] }) {
   if (headings.length === 0) return null;
 
   return (
-    <nav className="hidden xl:block">
+    <nav aria-label="On this page" className="hidden xl:block">
       <p className="mb-3 text-xs font-medium uppercase tracking-wider text-muted">
         On this page
       </p>

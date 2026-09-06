@@ -3,16 +3,16 @@ import DocMarkdown from "../components/docs/Markdown";
 import DocToc from "../components/docs/DocToc";
 import DocsPager from "../components/docs/DocsPager";
 import { getDoc, neighbors } from "../lib/docs";
-
-export const metadata: Metadata = {
+export const metadata: Metadata = {
   title: "Docs — Sere",
   description: "Language reference as the Sere compiler implements it.",
 };
+export const revalidate = 600;
 
-export default function DocsIndexPage() {
-  const doc = getDoc("index");
+async function Page() {
+  const doc = await getDoc("index");
   if (!doc) return null;
-  const { next } = neighbors("index");
+  const { next } = await neighbors("index");
 
   return (
     <div className="flex gap-12">
@@ -26,3 +26,4 @@ export default function DocsIndexPage() {
     </div>
   );
 }
+export default Page;

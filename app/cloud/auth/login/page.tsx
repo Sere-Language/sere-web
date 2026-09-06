@@ -49,7 +49,7 @@ function Field({
   const hintId = `${id}-hint`;
 
   return (
-    <label className="flex flex-col gap-1.5 text-xs font-medium text-muted">
+    <label className="flex flex-col gap-1.5 text-sm font-medium text-foreground">
       {label}
       <input
         id={id}
@@ -63,7 +63,7 @@ function Field({
         className={`w-full px-3 py-2 text-sm ${error ? ERROR_INPUT_CLASS : ""}`}
       />
       {hint ? (
-        <span id={hintId} className="text-[11px] font-normal leading-4 text-danger">
+        <span id={hintId} className="text-xs font-normal leading-5 text-danger">
           {error}
           {hint !== error ? ` ${hint}` : ""}
         </span>
@@ -137,14 +137,14 @@ export default function LoginPage() {
               to Sere Cloud.
             </>
           }
-          subtitle="Sign in to open your workspaces. Compile stays in the cloud."
+          subtitle="Sign in to edit, compile, and run your Sere projects."
         >
           <form className="w-full" onSubmit={handleSubmit} noValidate>
             <Stack gap="md">
               <Stack gap="sm">
                 <Heading level={2}>Sign in</Heading>
                 <Text muted className="text-sm">
-                  Same email and password you used to sign up.
+                  Open your saved projects.
                 </Text>
               </Stack>
               <Stack gap="sm">
@@ -172,9 +172,9 @@ export default function LoginPage() {
               </Button>
 
               {message ? (
-                <Text className={`text-sm ${isError ? "text-danger" : "text-success"}`}>
+                <p role={isError ? "alert" : "status"} className={`m-0 text-sm ${isError ? "text-danger" : "text-success"}`}>
                   {message}
-                </Text>
+                </p>
               ) : null}
 
               <Text muted className="text-sm">

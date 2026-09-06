@@ -17,11 +17,11 @@ export default function ProjectLoadingScreen({
 
   return (
     <div className="flex h-full w-full items-center justify-center bg-transparent px-6">
-      <div className="flex w-full max-w-sm flex-col items-center gap-6 rounded-2xl border border-white/8 bg-white/[0.04] px-8 py-10 backdrop-blur-2xl">
+      <div className="flex w-full max-w-sm flex-col items-center gap-6 rounded-lg border border-border bg-card px-8 py-10">
         <BrandMark size={56} priority className="opacity-90" />
         <div className="text-center">
           <p className="m-0 text-sm font-medium tracking-tight text-foreground">{projectName}</p>
-          <p className="mt-1 m-0 text-xs text-muted">{label}</p>
+          <p role="status" className="mt-1 m-0 text-xs text-muted">{label}</p>
         </div>
         <div className="w-full">
           <div

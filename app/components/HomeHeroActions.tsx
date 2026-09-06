@@ -13,10 +13,10 @@ export default function HomeHeroActions({
 }: HomeHeroActionsProps) {
   return (
     <div className="flex flex-wrap items-center gap-3">
-      <Button href={downloadHref} variant="ghost" className="px-4 py-2">
+      <Button href={downloadHref} className="px-4 py-2">
         {downloadLabel}
       </Button>
-      <Button href="/docs" variant="ghost" className="px-4 py-2">
+      <Button href="/docs" variant="secondary" className="px-4 py-2">
         Docs
       </Button>
     </div>

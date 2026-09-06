@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   createProject,
@@ -31,10 +31,11 @@ function KindOption({
     <button
       type="button"
       onClick={() => onSelect(kind)}
+      aria-pressed={selected}
       className={`rounded-lg border px-3 py-3 text-left transition-colors ${
         selected
           ? "border-primary bg-primary/10"
-          : "border-border bg-background/40 hover:border-primary/35"
+          : "border-border bg-background hover:bg-secondary"
       }`}
     >
       <p className="m-0 text-sm font-medium text-foreground">{title}</p>
@@ -55,6 +56,7 @@ export default function CreateProjectDialog({
   onClose,
 }: CreateProjectDialogProps) {
   const router = useRouter();
+  const dialogRef = useRef<HTMLDivElement>(null);
   const [name, setName] = useState("");
   const [kind, setKind] = useState<ProjectKind>(initialKind);
   const [error, setError] = useState("");
@@ -77,13 +79,41 @@ export default function CreateProjectDialog({
 
     function onKey(event: KeyboardEvent) {
       if (event.key === "Escape") {
+        event.preventDefault();
         onClose();
+      }
+      if (event.key === "Tab") {
+        const controls = dialogRef.current?.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), input:not([disabled]), a[href], [tabindex="0"]',
+        );
+        if (!controls?.length) return;
+        const first = controls[0];
+        const last = controls[controls.length - 1];
+        if (!dialogRef.current?.contains(document.activeElement)) {
+          event.preventDefault();
+          (event.shiftKey ? last : first).focus();
+        } else if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
       }
     }
 
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose, open]);
+
+  useEffect(() => {
+    if (!open) return;
+    const previouslyFocused = document.activeElement;
+    dialogRef.current?.querySelector<HTMLInputElement>("input")?.focus();
+    return () => {
+      if (previouslyFocused instanceof HTMLElement) previouslyFocused.focus();
+    };
+  }, [open]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -114,14 +144,15 @@ export default function CreateProjectDialog({
   }
 
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center px-4">
+    <div className="fixed inset-0 z-40 flex items-center justify-center p-4">
       <button
         type="button"
         className="absolute inset-0 bg-black/65"
+        tabIndex={-1}
         aria-label="Close create dialog"
         onClick={onClose}
       />
-      <div className="relative z-10 w-full max-w-lg rounded-lg border border-border bg-card p-5 shadow-md">
+      <div ref={dialogRef} role="dialog" aria-modal="true" aria-label="New project" className="relative z-10 max-h-[calc(100svh-2rem)] overflow-y-auto w-full max-w-lg rounded-lg border border-border bg-card p-5 shadow-md">
         <form onSubmit={handleSubmit}>
           <Stack gap="sm">
             <Heading level={3}>New project</Heading>
@@ -144,10 +175,12 @@ export default function CreateProjectDialog({
                 onSelect={setKind}
               />
             </div>
-            <label className="flex flex-col gap-1.5 text-xs font-medium text-muted">
+            <label className="flex flex-col gap-1.5 text-sm font-medium text-foreground">
               Project name
               <input
                 name="name"
+                aria-invalid={error ? true : undefined}
+                aria-describedby={error ? "create-project-error" : undefined}
                 value={name}
                 onChange={(event) => {
                   setName(event.target.value);
@@ -155,7 +188,6 @@ export default function CreateProjectDialog({
                 }}
                 placeholder={kind === "lib" ? "mathlib" : "hello-world"}
                 required
-                autoFocus
                 className="w-full px-3 py-2 text-sm"
               />
             </label>
@@ -164,7 +196,7 @@ export default function CreateProjectDialog({
                 ? `/cloud/projects/${slug} · ${projectKindLabel(kind)}`
                 : `/cloud/projects/… · ${projectKindLabel(kind)}`}
             </Text>
-            {error ? <Text className="text-sm text-danger">{error}</Text> : null}
+            {error ? <p id="create-project-error" role="alert" className="m-0 text-sm text-danger">{error}</p> : null}
             <div className="flex flex-wrap items-center gap-2">
               <Button type="submit" disabled={creating}>
                 {creating

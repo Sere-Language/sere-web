@@ -16,7 +16,10 @@ function Toggle({
   return (
     <button
       type="button"
-      className="flex w-full items-start justify-between gap-6 rounded-xl px-1 py-3 text-left hover:bg-white/4"
+      role="switch"
+      aria-checked={checked}
+      aria-label={label}
+      className="flex w-full items-start justify-between gap-6 rounded-md px-1 py-3 text-left hover:bg-white/4"
       onClick={() => onChange(!checked)}
     >
       <span>
@@ -48,7 +51,7 @@ export default function SettingsPanel() {
   } = useWorkspace();
 
   return (
-    <div className="h-full overflow-auto px-8 py-7">
+    <div className="h-full overflow-auto px-4 py-6 sm:px-8">
       <div className="mx-auto max-w-xl">
         <p className="m-0 text-[11px] font-medium uppercase tracking-[0.16em] text-muted">
           Preferences
@@ -59,7 +62,7 @@ export default function SettingsPanel() {
           <h3 className="mb-2 text-[12px] font-medium uppercase tracking-[0.12em] text-muted">
             Editor
           </h3>
-          <div className="rounded-2xl border border-white/8 bg-white/[0.03] px-4">
+          <div className="rounded-lg border border-border bg-card px-4">
             <div className="flex items-center justify-between gap-6 border-b border-white/6 py-3">
               <span>
                 <span className="block text-[13px] text-foreground">Font size</span>
@@ -70,7 +73,8 @@ export default function SettingsPanel() {
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  className="inline-flex size-7 items-center justify-center rounded-lg text-muted hover:bg-white/8 hover:text-foreground"
+                  aria-label="Decrease font size"
+                  className="inline-flex size-8 shrink-0 items-center justify-center rounded-md text-muted hover:bg-white/8 hover:text-foreground"
                   onClick={() =>
                     updateSettings({ fontSize: Math.max(11, settings.fontSize - 1) })
                   }
@@ -80,7 +84,8 @@ export default function SettingsPanel() {
                 <span className="w-8 text-center text-[13px] tabular-nums">{settings.fontSize}</span>
                 <button
                   type="button"
-                  className="inline-flex size-7 items-center justify-center rounded-lg text-muted hover:bg-white/8 hover:text-foreground"
+                  aria-label="Increase font size"
+                  className="inline-flex size-8 shrink-0 items-center justify-center rounded-md text-muted hover:bg-white/8 hover:text-foreground"
                   onClick={() =>
                     updateSettings({ fontSize: Math.min(18, settings.fontSize + 1) })
                   }
@@ -108,7 +113,7 @@ export default function SettingsPanel() {
           <h3 className="mb-2 text-[12px] font-medium uppercase tracking-[0.12em] text-muted">
             Build
           </h3>
-          <div className="rounded-2xl border border-white/8 bg-white/[0.03] px-4">
+          <div className="rounded-lg border border-border bg-card px-4">
             <Toggle
               label="Emit LLVM / ASM on run"
               description="Refresh the IR and assembly views after a successful build or run."
@@ -122,14 +127,14 @@ export default function SettingsPanel() {
           <h3 className="mb-2 text-[12px] font-medium uppercase tracking-[0.12em] text-muted">
             Layout
           </h3>
-          <div className="rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-3">
+          <div className="rounded-lg border border-border bg-card px-4 py-3">
             <p className="m-0 text-[13px] text-foreground">Workbench layout</p>
             <p className="mt-0.5 mb-3 text-[12px] text-muted">
               Restore the default files, editor, output, and terminal arrangement.
             </p>
             <button
               type="button"
-              className="rounded-lg bg-white/8 px-3 py-1.5 text-[12px] text-foreground hover:bg-white/12"
+              className="min-h-9 rounded-md border border-border bg-secondary px-3 py-1.5 text-[12px] text-foreground hover:bg-white/12"
               onClick={resetLayout}
             >
               Reset layout

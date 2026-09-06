@@ -47,7 +47,7 @@ function Stat({
   hint: string;
 }) {
   return (
-    <div className="rounded-2xl border border-white/8 bg-card/80 px-4 py-4 backdrop-blur-sm">
+    <div className="min-w-0 px-4 py-4">
       <p className="m-0 text-[11px] uppercase tracking-wider text-muted">{label}</p>
       <p className="m-0 mt-2 truncate text-2xl font-semibold tracking-tight" title={value}>
         {value}
@@ -117,9 +117,9 @@ export default function CloudDashboard() {
         <Button onClick={() => setCreateKind("app")}>New project</Button>
       </div>
 
-      {listError ? <Text className="text-sm text-danger">{listError}</Text> : null}
+      {listError ? <p role="alert" className="m-0 text-sm text-danger">{listError}</p> : null}
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 divide-x divide-border border-y border-border lg:grid-cols-4">
         <Stat
           label="Projects"
           value={loaded ? String(counts.total) : "—"}
@@ -156,8 +156,8 @@ export default function CloudDashboard() {
           </div>
           {!loaded ? (
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <div className="h-36 rounded-lg border border-border bg-card/50" />
-              <div className="h-36 rounded-lg border border-border bg-card/50" />
+              <div className="h-36 rounded-lg border border-border bg-card" />
+              <div className="h-36 rounded-lg border border-border bg-card" />
             </div>
           ) : recent.length === 0 ? (
             <Card>
@@ -196,7 +196,7 @@ export default function CloudDashboard() {
 
         <Stack gap="md">
           <Heading level={3}>Create</Heading>
-          <div className="overflow-hidden rounded-2xl border border-white/8 bg-card/80">
+          <div className="overflow-hidden rounded-lg border border-border bg-card">
             <button
               type="button"
               className="flex w-full flex-col gap-1 border-b border-border px-4 py-3.5 text-left transition-colors hover:bg-primary/10"
@@ -220,7 +220,7 @@ export default function CloudDashboard() {
           </div>
 
           <Heading level={3}>Shortcuts</Heading>
-          <div className="rounded-2xl border border-white/8 bg-card/80 px-4 py-3">
+          <div className="rounded-lg border border-border bg-card px-4 py-3">
             <dl className="m-0 grid gap-2.5 text-xs">
               <div className="flex items-center justify-between gap-3">
                 <dt className="text-muted">Save</dt>

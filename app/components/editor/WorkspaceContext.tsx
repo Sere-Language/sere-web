@@ -860,24 +860,29 @@ export function WorkspaceProvider({
         ]);
         shellCountRef.current = 1;
         log(`Guest filesystem ready at ${GUEST_ROOT} (${guestFiles.length} files).\n`);
-        setBootProgress({ percent: 88, label: "Installing Sere…" });
-        log("Installing Sere…\n");
+        setBootProgress({ percent: 86, label: "Starting Windows compiler host…" });
+        log("Starting the Windows compiler host…\n");
+        try {
+          const host = await bootCompilerHost();
+          sereBackendRef.current = "host";
+          setCompilerBackend("host");
+          setSereVersion(host.env.version);
+          log(`${host.message}\n`);
+        } catch (hostCaught) {
+          log(
+            `Compiler host: ${hostCaught instanceof Error ? hostCaught.message : "failed"}\n`,
+          );
+        }
         try {
           const installed = await vm.installSere();
           log(`${installed.message}\n`);
-          if (installed.hasCompiler) {
+          if (installed.hasCompiler && sereBackendRef.current !== "host") {
             sereBackendRef.current = "nano";
             setCompilerBackend("nano");
             const version = await vm.run("sere --version");
             const diagnostic = diagnoseGuestSereFailure(version.output, version.exitCode);
             if (diagnostic) {
               log(`${diagnostic}\n`);
-              log("Guest compiler is the wrong ISA or missing. Starting the Windows compiler host…\n");
-              const host = await bootCompilerHost();
-              sereBackendRef.current = "host";
-              setCompilerBackend("host");
-              setSereVersion(host.env.version);
-              log(`${host.message}\n`);
             } else {
               const line = version.output.trim().split("\n")[0] ?? installed.tag;
               setSereVersion(line || installed.tag);
@@ -885,32 +890,11 @@ export function WorkspaceProvider({
                 log(version.output.endsWith("\n") ? version.output : `${version.output}\n`);
               }
             }
-          } else {
-            log("No Linux compiler in linux.zip. Starting the Windows compiler host…\n");
-            const host = await bootCompilerHost();
-            sereBackendRef.current = "host";
-            setCompilerBackend("host");
-            setSereVersion(host.env.version);
-            log(`${host.message}\n`);
           }
         } catch (installCaught) {
           log(
             `Linux zip: ${installCaught instanceof Error ? installCaught.message : "failed"}\n`,
           );
-          try {
-            log("Starting the Windows compiler host…\n");
-            const host = await bootCompilerHost();
-            sereBackendRef.current = "host";
-            setCompilerBackend("host");
-            setSereVersion(host.env.version);
-            log(`${host.message}\n`);
-          } catch (hostCaught) {
-            sereBackendRef.current = null;
-            setCompilerBackend(null);
-            log(
-              `Compiler host: ${hostCaught instanceof Error ? hostCaught.message : "failed"}\n`,
-            );
-          }
         }
       } catch (caught) {
         log(
@@ -1078,26 +1062,40 @@ export function WorkspaceProvider({
 
   const runSereCommand = useCallback(
     async (command: string, shellId = DEFAULT_SHELL_ID) => {
-      if (sereBackendRef.current === "host") {
-        const result = await execHostCommand(
-          projectId,
-          command,
-          persistableFiles(filesRef.current),
-        );
-        applyHostSnapshot(result.files ?? []);
-        return {
-          output: combineStreams(result),
-          cwd: nanoRef.current?.shellCwd(shellId) ?? GUEST_ROOT,
-          exitCode: result.exitCode,
-        };
+      const startHost = async () => {
+        const host = await bootCompilerHost();
+        sereBackendRef.current = "host";
+        setCompilerBackend("host");
+        setSereVersion(host.env.version);
+      };
+
+      if (sereBackendRef.current !== "host") {
+        try {
+          await startHost();
+        } catch (caught) {
+          const vm = nanoRef.current;
+          if (vm) {
+            return vm.run(command, undefined, shellId);
+          }
+          throw new Error(
+            caught instanceof Error
+              ? `Windows compiler host did not start: ${caught.message}`
+              : "Windows compiler host did not start.",
+          );
+        }
       }
-      const vm = nanoRef.current;
-      if (!vm) {
-        throw new Error(
-          "Sere is not available. linux.zip has no bin/sere, and the Windows host did not start.",
-        );
-      }
-      return vm.run(command, undefined, shellId);
+
+      const result = await execHostCommand(
+        projectId,
+        command,
+        persistableFiles(filesRef.current),
+      );
+      applyHostSnapshot(result.files ?? []);
+      return {
+        output: combineStreams(result),
+        cwd: nanoRef.current?.shellCwd(shellId) ?? GUEST_ROOT,
+        exitCode: result.exitCode,
+      };
     },
     [applyHostSnapshot, projectId],
   );

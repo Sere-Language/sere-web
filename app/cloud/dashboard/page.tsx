@@ -10,8 +10,8 @@ export const metadata: Metadata = {
 
 export default function CloudDashboardPage() {
   return (
-    <Container>
-      <Section className="pt-10 pb-16">
+    <Container className="max-w-7xl">
+      <Section className="py-8">
         <CloudDashboard />
       </Section>
     </Container>

@@ -29,22 +29,31 @@ function headingText(node: React.ReactNode): string {
 }
 
 const components: Components = {
-  h1: ({ children }) => <h1>{children}</h1>,
+  h1: ({ children }) => (
+    <h1 className="mt-0 mb-4">{children}</h1>
+  ),
   h2: ({ children }) => {
     const text = headingText(children);
-    return <h2 id={slugify(text)}>{children}</h2>;
+    const id = slugify(text) || undefined;
+    return <h2 id={id} className="mt-12 mb-3 pb-2 border-b border-border-muted">{children}</h2>;
   },
   h3: ({ children }) => {
     const text = headingText(children);
-    return <h3 id={slugify(text)}>{children}</h3>;
+    const id = slugify(text) || undefined;
+    return <h3 id={id} className="mt-8 mb-2">{children}</h3>;
   },
   a: ({ href, children }) => {
     const next = rewriteHref(href);
     if (!next) return <span>{children}</span>;
     if (next.startsWith("http://") || next.startsWith("https://")) {
       return (
-        <a href={next} target="_blank" rel="noreferrer">
+        <a href={next} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1">
           {children}
+          <svg className="w-3.5 h-3.5 opacity-60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+            <polyline points="15 3 21 3 21 9" />
+            <line x1="10" y1="14" x2="21" y2="3" />
+          </svg>
         </a>
       );
     }
@@ -61,23 +70,23 @@ const components: Components = {
     const highlighted = lang === "sere" ? highlightSere(text) : text;
 
     return (
-      <div className="my-5">
-        <CodeBlock filename={lang || undefined} wide quiet>
+      <div className="my-6">
+        <CodeBlock filename={lang || undefined} wide>
           {highlighted}
         </CodeBlock>
       </div>
     );
   },
   table: ({ children }) => (
-    <div className="mb-5 overflow-x-auto rounded-lg border border-border">
-      <table>{children}</table>
+    <div className="my-5 overflow-x-auto rounded-lg border border-border bg-card shadow-sm">
+      <table className="w-full">{children}</table>
     </div>
   ),
 };
 
 export default function DocMarkdown({ source }: { source: string }) {
   return (
-    <div className="doc-prose fade-up">
+    <div className="doc-prose">
       <Markdown remarkPlugins={[remarkGfm]} components={components}>
         {source}
       </Markdown>

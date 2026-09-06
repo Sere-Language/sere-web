@@ -31,7 +31,7 @@ export default function CloudHomeCta() {
   return (
     <Stack gap="sm">
       <Text muted className="max-w-2xl text-sm leading-6">
-        Create an account, then open the dashboard. Workspaces come next.
+        Create an account to save and run your projects in the browser.
       </Text>
       <div className="flex flex-wrap items-center gap-3">
         <Button href="/cloud/auth/signup">Sign up</Button>

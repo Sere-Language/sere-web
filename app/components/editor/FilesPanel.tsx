@@ -639,7 +639,7 @@ export default function FilesPanel() {
         ? createPortal(
             <div
               ref={menuRef}
-              className="fixed z-[200] min-w-48 rounded-lg border border-white/10 bg-[#141618]/95 py-1 shadow-[0_12px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl"
+              className="fixed z-[200] min-w-48 rounded-md border border-border bg-card py-1 shadow-lg"
               style={{ left: menuPos.x || menu.x, top: menuPos.y || menu.y }}
               onClick={(event) => event.stopPropagation()}
               onContextMenu={(event) => event.preventDefault()}
@@ -753,7 +753,7 @@ function HeaderButton({
       title={label}
       aria-label={label}
       disabled={disabled}
-      className="inline-flex size-7 items-center justify-center rounded-md text-muted hover:bg-white/8 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30"
+      className="inline-flex size-8 items-center justify-center rounded-md text-muted hover:bg-white/8 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30"
       onClick={(event) => {
         event.stopPropagation();
         onClick();
@@ -779,8 +779,8 @@ function MenuRow({
     <button
       type="button"
       disabled={disabled}
-      className={`block w-full rounded-lg px-3 py-2 text-left text-[12px] disabled:cursor-not-allowed disabled:opacity-40 ${
-        danger ? "text-[#c25248] hover:bg-[#c25248]/10" : "text-[#eeeae8] hover:bg-white/8"
+      className={`block min-h-8 w-full rounded-md px-3 py-2 text-left text-[12px] disabled:cursor-not-allowed disabled:opacity-40 ${
+        danger ? "text-danger hover:bg-danger/10" : "text-foreground hover:bg-white/8"
       }`}
       onClick={onClick}
     >
@@ -857,9 +857,10 @@ function InlineNameInput({
   return (
     <input
       ref={inputRef}
+      aria-label="File or folder name"
       autoFocus
       value={value}
-      className="min-w-0 flex-1 rounded-md border border-primary/70 bg-black/30 px-1.5 text-[12px] text-[#eeeae8] outline-none"
+      className="min-w-0 flex-1 rounded-md border border-primary bg-background px-1.5 text-[12px] text-foreground outline-none"
       onClick={(event) => event.stopPropagation()}
       onChange={(event) => onValue(event.target.value)}
       onBlur={() => {

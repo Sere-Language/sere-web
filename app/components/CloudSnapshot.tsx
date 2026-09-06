@@ -38,10 +38,7 @@ export default function CloudSnapshot({
 
   return (
     <figure className={`cloud-shot ${compact ? "cloud-shot-compact" : ""} ${className ?? ""}`}>
-      <div aria-hidden className="cloud-shot-glow" />
-      <div aria-hidden className="cloud-shot-orbit" />
       <div className="cloud-shot-frame">
-        <div aria-hidden className="cloud-shot-shine" />
         <Image
           src={SRC}
           alt="Sere Cloud workbench with files, editor, terminal, and LLVM IR"

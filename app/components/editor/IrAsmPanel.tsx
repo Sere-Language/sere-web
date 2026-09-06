@@ -25,18 +25,20 @@ export default function IrAsmPanel() {
       <div className="flex shrink-0 gap-1 px-3 py-2">
         <button
           type="button"
-          className={`rounded-md px-3 py-1 text-[11px] ${
+          className={`min-h-8 rounded-md px-3 py-1 text-[11px] ${
             mode === "llvm" ? "bg-white/10 text-accent" : "text-muted hover:bg-white/6"
           }`}
+          aria-pressed={mode === "llvm"}
           onClick={() => setMode("llvm")}
         >
           LLVM IR
         </button>
         <button
           type="button"
-          className={`rounded-md px-3 py-1 text-[11px] ${
+          className={`min-h-8 rounded-md px-3 py-1 text-[11px] ${
             mode === "asm" ? "bg-white/10 text-accent" : "text-muted hover:bg-white/6"
           }`}
+          aria-pressed={mode === "asm"}
           onClick={() => setMode("asm")}
         >
           ASM

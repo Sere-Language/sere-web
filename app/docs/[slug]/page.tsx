@@ -11,8 +11,9 @@ interface DocSlugPageProps {
 
 export const dynamicParams = true;
 
-export function generateStaticParams(): { slug: string }[] {
-  return listDocs()
+export async function generateStaticParams(): Promise<{ slug: string }[]> {
+  const docs = await listDocs();
+  return docs
     .filter((doc) => doc.slug !== "index")
     .map((doc) => ({ slug: doc.slug }));
 }
@@ -21,7 +22,7 @@ export async function generateMetadata({
   params,
 }: DocSlugPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const doc = getDoc(slug);
+  const doc = await getDoc(slug);
   if (!doc) return { title: "Docs — Sere" };
   return {
     title: `${doc.title} — Sere`,
@@ -33,10 +34,10 @@ export default async function DocSlugPage({ params }: DocSlugPageProps) {
   const { slug } = await params;
   if (slug === "index") notFound();
 
-  const doc = getDoc(slug);
+  const doc = await getDoc(slug);
   if (!doc) notFound();
 
-  const { prev, next } = neighbors(slug);
+  const { prev, next } = await neighbors(slug);
 
   return (
     <div className="flex gap-12">

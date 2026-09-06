@@ -18,27 +18,30 @@ export default function PageIntro({
   children,
 }: PageIntroProps) {
   return (
-    <Container>
-      <Section className="relative pt-12">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute left-0 top-4 h-56 w-[28rem] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(194,82,72,0.18),transparent_68%)] blur-2xl"
-        />
+    <div className="relative">
+      <div className="absolute inset-x-0 top-0 h-[28rem] overflow-hidden -z-10 pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-b from-accent/[0.04] via-transparent to-transparent" />
+        <div className="absolute top-0 left-1/4 w-96 h-1 bg-gradient-to-r from-transparent via-primary/10 to-transparent blur-xl" />
+      </div>
+      <Container>
+      <Section className="py-12 md:py-16">
         <Stack gap="lg">
           <Stack gap="sm">
-            <p className="fade-up m-0 text-[11px] font-medium uppercase tracking-[0.22em] text-primary">
+            <p className="fade-up m-0 text-[11px] font-medium uppercase tracking-[0.22em] text-primary bg-primary/10 px-2.5 py-1 rounded inline-flex items-center gap-1.5">
+              <span className="w-1 h-1 rounded-full bg-primary/60" />
               {eyebrow}
             </p>
-            <Heading className="fade-up text-4xl sm:text-5xl">
+            <Heading className="fade-up text-4xl sm:text-5xl font-semibold tracking-tight">
               {title}
             </Heading>
-            <Text muted className="fade-up fade-up-delay max-w-2xl">
+            <Text muted className="fade-up fade-up-delay max-w-2xl text-base leading-7">
               {description}
             </Text>
           </Stack>
           {children}
         </Stack>
       </Section>
-    </Container>
+      </Container>
+    </div>
   );
 }
