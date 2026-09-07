@@ -11,7 +11,7 @@ import Stack from "../components/Stack";
 import Text from "../components/Text";
 
 export const metadata: Metadata = {
-  title: "Issues — Sere",
+  title: "Issues - Sere",
   description: "View and track issues from the Sere GitHub repository.",
 };
 

@@ -3,11 +3,12 @@ import DocMarkdown from "../components/docs/Markdown";
 import DocToc from "../components/docs/DocToc";
 import DocsPager from "../components/docs/DocsPager";
 import { getDoc, neighbors } from "../lib/docs";
-export const metadata: Metadata = {
-  title: "Docs — Sere",
-  description: "Language reference as the Sere compiler implements it.",
-};
-export const revalidate = 600;
+
+export const metadata: Metadata = {
+    title: "Docs - Sere",
+    description: "Language reference as the Sere compiler implements it.",
+  };
+  export const revalidate = 300;
 
 async function Page() {
   const doc = await getDoc("index");
@@ -26,4 +27,5 @@ async function Page() {
     </div>
   );
 }
-export default Page;
+
+export default Page;

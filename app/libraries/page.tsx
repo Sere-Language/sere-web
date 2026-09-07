@@ -11,19 +11,19 @@ import Text from "../components/Text";
 import { highlightSere } from "../utils/highlight";
 
 export const metadata: Metadata = {
-  title: "Libraries — Sere",
+  title: "Libraries - Sere",
   description: "Standard library modules and drop-in .slib packages.",
 };
 
 const MODULES = [
   { name: "prelude", body: "Always injected: print, abs, min, max, Int / Float, dbg!." },
-  { name: "io", body: "read_line, eprint — extra I/O on top of the print intrinsic." },
+  { name: "io", body: "read_line, eprint, extra I/O on top of the print intrinsic." },
   { name: "fs / path / os / env / sys", body: "Files, paths, process, and the host." },
   { name: "string / bytes / encoding / regex", body: "Text and binary. Backtick literals type as regex." },
   { name: "math / vec / matrix / ml / arrays", body: "Numeric work and linear algebra." },
   { name: "hash / random / time / log / bit", body: "Utilities you reach for in a real binary." },
   { name: "gc / heap / memory", body: "Collectors, arenas, pointer vocabulary." },
-  { name: "inspect", body: "label and describe — not the builtin typeof / dir." },
+  { name: "inspect", body: "label and describe, not the builtin typeof / dir." },
   { name: "html_lang", body: "html: raw macro plus the Html wrapper." },
   { name: "windows / gl / qt6", body: "Win32, OpenGL 2.1+, Qt widgets (stub if missing)." },
   { name: "requests", body: "HTTP client: get, post, put, delete." },

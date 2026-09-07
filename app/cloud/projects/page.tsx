@@ -5,7 +5,7 @@ import Container from "../../components/Container";
 import Section from "../../components/Section";
 
 export const metadata: Metadata = {
-  title: "Projects — Sere Cloud",
+  title: "Projects - Sere Cloud",
   description: "Create and open Sere Cloud projects.",
 };
 

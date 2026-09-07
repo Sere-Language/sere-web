@@ -9,7 +9,7 @@ import Stack from "../components/Stack";
 import Text from "../components/Text";
 
 export const metadata: Metadata = {
-  title: "Contribution — Sere",
+  title: "Contribution - Sere",
   description: "How to contribute to the Sere compiler, runtime, and tooling.",
 };
 

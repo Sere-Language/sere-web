@@ -9,7 +9,7 @@ export async function generateMetadata({
 }: ProjectPageProps): Promise<Metadata> {
   const { project } = await params;
   return {
-    title: `${decodeURIComponent(project)} — Sere Cloud`,
+    title: `${decodeURIComponent(project)} - Sere Cloud`,
   };
 }
 

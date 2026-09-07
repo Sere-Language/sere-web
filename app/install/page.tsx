@@ -20,7 +20,7 @@ import {
 } from "../lib/release";
 
 export const metadata: Metadata = {
-  title: "Install — Sere",
+  title: "Install - Sere",
   description: "Install the Sere toolchain, put it on PATH, and compile a native binary.",
 };
 
@@ -242,7 +242,7 @@ export default async function InstallPage() {
               <Heading level={2}>Portable zip</Heading>
               <Text muted className="max-w-2xl">
                 Unzip {recommended?.name ?? "the release"}, then run the script.
-                LLVM is reused from a previous bootstrap or downloaded — it is
+                LLVM is reused from a previous bootstrap or downloaded, it is
                 not stored in git. After install, a new terminal should run{" "}
                 <code>sere --version</code> without this repository.
               </Text>

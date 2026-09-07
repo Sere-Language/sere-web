@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 const DOCS_DIR = path.join(process.cwd(), "content", "docs");
-const GITHUB_DOCS_API = "https://api.github.com/repos/Sere-Language/sere/contents/content/docs";
+const GITHUB_DOCS_API = "https://api.github.com/repos/Sere-Language/sere/contents/docs";
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN ?? "";
 
@@ -40,7 +40,8 @@ async function fetchFromGitHub(): Promise<Map<string, { content: string; sha: st
   try {
     const response = await fetch(GITHUB_DOCS_API, {
       headers: githubHeaders(),
-      next: { revalidate: 600 },
+      // Cache the listing for a few minutes, not forever.
+      next: { revalidate: 300 },
     });
     if (!response.ok) return new Map();
     const files = (await response.json()) as Array<{
@@ -88,18 +89,7 @@ function readLocalDocs(): Map<string, { content: string; sha: null; lastModified
   return result;
 }
 
-async function readSource(slug: string): Promise<{ content: string; sha: string | null; lastModified: string | null }> {
-  const local = readLocalDocs();
-  if (local.has(slug)) {
-    // Try GitHub first for freshness, fall back to local.
-    const github = await fetchFromGitHub();
-    if (github.has(slug)) {
-      return github.get(slug)!;
-    }
-    return local.get(slug)!;
-  }
-  return { content: "", sha: null, lastModified: null };
-}
+// GitHub first, local files as fallback so the site still works offline.
 
 
 function titleFromSource(source: string, slug: string): string {

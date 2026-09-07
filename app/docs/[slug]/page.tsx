@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import DocMarkdown from "../../components/docs/Markdown";
 import DocToc from "../../components/docs/DocToc";
 import DocsPager from "../../components/docs/DocsPager";
-import { getDoc, listDocs, neighbors } from "../../lib/docs";
+import { getDoc, neighbors } from "../../lib/docs";
 
 interface DocSlugPageProps {
   params: Promise<{ slug: string }>;
@@ -11,21 +11,18 @@ interface DocSlugPageProps {
 
 export const dynamicParams = true;
 
-export async function generateStaticParams(): Promise<{ slug: string }[]> {
-  const docs = await listDocs();
-  return docs
-    .filter((doc) => doc.slug !== "index")
-    .map((doc) => ({ slug: doc.slug }));
-}
+// Not statically generated. Docs are synced from the sere repo on demand,
+// so new pages show up without a rebuild.
+export const revalidate = 300;
 
 export async function generateMetadata({
   params,
 }: DocSlugPageProps): Promise<Metadata> {
   const { slug } = await params;
   const doc = await getDoc(slug);
-  if (!doc) return { title: "Docs — Sere" };
+  if (!doc) return { title: "Docs - Sere" };
   return {
-    title: `${doc.title} — Sere`,
+    title: `${doc.title} - Sere`,
     description: doc.description,
   };
 }

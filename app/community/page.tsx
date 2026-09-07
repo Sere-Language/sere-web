@@ -9,7 +9,7 @@ import Stack from "../components/Stack";
 import Text from "../components/Text";
 
 export const metadata: Metadata = {
-  title: "Community — Sere",
+  title: "Community - Sere",
   description: "Follow releases, file issues, and talk through design in the open.",
 };
 

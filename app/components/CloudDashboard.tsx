@@ -122,22 +122,22 @@ export default function CloudDashboard() {
       <div className="grid grid-cols-2 divide-x divide-border border-y border-border lg:grid-cols-4">
         <Stat
           label="Projects"
-          value={loaded ? String(counts.total) : "—"}
+          value={loaded ? String(counts.total) : "-"}
           hint={counts.total === 1 ? "One workspace" : "Saved in your account"}
         />
         <Stat
           label="Apps"
-          value={loaded ? String(counts.apps) : "—"}
+          value={loaded ? String(counts.apps) : "-"}
           hint="Binaries · sere run"
         />
         <Stat
           label="Libraries"
-          value={loaded ? String(counts.libraries) : "—"}
+          value={loaded ? String(counts.libraries) : "-"}
           hint="Packable · sere pack"
         />
         <Stat
           label="Latest"
-          value={loaded && newest ? newest.name : "—"}
+          value={loaded && newest ? newest.name : "-"}
           hint={
             newest
               ? `Created ${formatRelativeTime(newest.createdAt)}`

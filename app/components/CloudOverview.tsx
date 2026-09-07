@@ -22,12 +22,12 @@ const FEATURES = [
   {
     kicker: "01",
     title: "Editor",
-    body: "Files, Monaco, a real terminal, and LLVM IR in one dock — the same layout you get locally.",
+    body: "Files, Monaco, a real terminal, and LLVM IR in one dock. Same layout you get locally.",
   },
   {
     kicker: "02",
     title: "Compile",
-    body: "Build and run in a Linux VM in this tab (NanoVM). Same native Sere when linux.zip includes a guest binary — not a remote LLVM farm.",
+    body: "Build and run in a Linux VM in this tab (NanoVM). Same native Sere when linux.zip includes a guest binary, not a remote LLVM farm.",
   },
   {
     kicker: "03",

@@ -4,7 +4,7 @@ import Container from "../components/Container";
 import Section from "../components/Section";
 
 export const metadata: Metadata = {
-  title: "Cloud — Sere",
+  title: "Cloud - Sere",
   description:
     "Browser workbench for Sere: Monaco and a Linux VM in this tab, files on your account.",
 };

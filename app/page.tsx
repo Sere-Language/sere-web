@@ -91,8 +91,8 @@ export default async function Home() {
               </Heading>
             </div>
             <Text muted className="max-w-md text-base leading-7">
-              Sere reads like Python and compiles to native code through LLVM.
-              Write it, build it, run it — same toolchain, no runtime hidden in the background.
+              Sere reads like Python and compiles down to native code through LLVM.
+              Write it, build it, run it. Same toolchain the whole way, no runtime hiding in the background.
             </Text>
             <HomeHeroActions
               downloadHref={downloadHref}
@@ -124,7 +124,7 @@ export default async function Home() {
             </Feature>
             <Feature title="Native binaries" delay={80}>
               LLVM 22 backend turns Sere into a real executable.
-              Your code runs directly on the machine — nothing in between.
+              Your code runs directly on the machine, nothing in between.
             </Feature>
             <Feature title="When you need it" delay={160}>
               Unique and Shared pointers, structs, enums, and macros.
@@ -142,7 +142,8 @@ export default async function Home() {
           <Grid cols={3}>
             <Feature title="Real types" href="/docs/types">
               i8 through i64, f32 and f64, list[T], dict[K, V], Unique[T],
-              and structs that copy by value. Types are checked at compile time.
+              and structs that copy by value. Checked at compile time, so you find out
+              before you run it.
             </Feature>
             <Feature title="Macros" href="/docs/macros" delay={80}>
               Quote bodies and call name!(...) when you need them.
@@ -153,8 +154,8 @@ export default async function Home() {
               Plug in mark-sweep, arena allocation, or write your own collector.
             </Feature>
             <Feature title="Clear errors" href="/docs/errors">
-              TypeError, NameError, AttributeError — names that match what went wrong.
-              Diagnostics point to the exact spot, not just the line above it.
+              TypeError, NameError, AttributeError. Names that actually tell you what broke.
+              Diagnostics point at the exact spot, not just the line above it.
             </Feature>
             <Feature title="Editor support" href="/docs/diagnostics" delay={80}>
               LSP for Cursor and VS Code handles highlighting, go-to-definition,
