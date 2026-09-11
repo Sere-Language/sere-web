@@ -19,19 +19,17 @@ export default function PageIntro({
 }: PageIntroProps) {
   return (
     <div className="relative">
-      <div className="absolute inset-x-0 top-0 h-[28rem] overflow-hidden -z-10 pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-b from-accent/[0.04] via-transparent to-transparent" />
-        <div className="absolute top-0 left-1/4 w-96 h-1 bg-gradient-to-r from-transparent via-primary/10 to-transparent blur-xl" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[30rem] overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/[0.05] via-transparent to-transparent" />
+        <div className="absolute -top-28 left-1/4 h-64 w-[36rem] rounded-full bg-primary/[0.07] blur-[90px]" />
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
       </div>
       <Container>
-      <Section className="py-12 md:py-16">
+      <Section className="py-14 md:py-18">
         <Stack gap="lg">
           <Stack gap="sm">
-            <p className="fade-up m-0 text-[11px] font-medium uppercase tracking-[0.22em] text-primary bg-primary/10 px-2.5 py-1 rounded inline-flex items-center gap-1.5">
-              <span className="w-1 h-1 rounded-full bg-primary/60" />
-              {eyebrow}
-            </p>
-            <Heading className="fade-up text-4xl sm:text-5xl font-semibold tracking-tight">
+            <p className="eyebrow fade-up w-fit">{eyebrow}</p>
+            <Heading className="fade-up text-4xl font-semibold tracking-tight sm:text-5xl">
               {title}
             </Heading>
             <Text muted className="fade-up fade-up-delay max-w-2xl text-base leading-7">

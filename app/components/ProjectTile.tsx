@@ -1,10 +1,10 @@
-import Link from "next/link";
 import {
-  formatProjectCreatedAt,
-  formatRelativeTime,
-  projectPath,
-  type CloudProject,
+    formatProjectCreatedAt,
+    formatRelativeTime,
+    projectPath,
+    type CloudProject,
 } from "@/app/lib/projects";
+import Link from "next/link";
 import Button from "./Button";
 import KindBadge from "./KindBadge";
 
@@ -23,7 +23,7 @@ export default function ProjectTile({
   const activityLabel = lastOpened ? "Opened" : "Created";
 
   return (
-    <article className="flex flex-col gap-3 rounded-lg border border-border bg-card p-4">
+    <article className="panel panel-interactive flex flex-col gap-3 p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <Link
@@ -38,6 +38,7 @@ export default function ProjectTile({
         </div>
         <KindBadge kind={project.kind} />
       </div>
+      <div className="rule" />
       <p
         className="m-0 text-xs text-muted"
         title={formatProjectCreatedAt(activityIso)}

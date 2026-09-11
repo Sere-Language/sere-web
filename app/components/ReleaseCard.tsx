@@ -1,17 +1,17 @@
+import {
+    formatBytes,
+    formatReleaseDate,
+    type SereRelease,
+} from "../lib/release";
 import Button from "./Button";
 import Card from "./Card";
 import Heading from "./Heading";
 import Stack from "./Stack";
 import Text from "./Text";
-import {
-  formatBytes,
-  formatReleaseDate,
-  type SereRelease,
-} from "../lib/release";
 
 function Badge({ children }: { children: React.ReactNode }) {
   return (
-    <span className="rounded-md border border-border px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wide text-muted">
+    <span className="inline-flex items-center rounded-sm border border-border-muted bg-surface-well px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wide text-muted shadow-inset-sm">
       {children}
     </span>
   );

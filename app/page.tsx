@@ -1,10 +1,10 @@
+import Link from "next/link";
 import BrandMark from "./components/BrandMark";
 import Card from "./components/Card";
 import CodeBlock from "./components/CodeBlock";
 import Container from "./components/Container";
 import Grid from "./components/Grid";
 import Heading from "./components/Heading";
-import Link from "next/link";
 import HomeHeroActions from "./components/HomeHeroActions";
 import Reveal from "./components/Reveal";
 import Section from "./components/Section";
@@ -19,43 +19,57 @@ export const revalidate = 300;
 function Feature({
   title,
   href,
+  index,
   delay = 0,
   children,
 }: {
   title: string;
   href?: string;
+  index: number;
   delay?: number;
   children: string;
 }) {
+  const serial = String(index).padStart(2, "0");
+
+  const body = (
+    <Card variant="elevated" className="h-full">
+      <div className="flex h-full flex-col gap-3">
+        <div className="flex items-center justify-between gap-3">
+          <span className="serial">{serial}</span>
+          <span className="h-px flex-1 bg-gradient-to-r from-border to-transparent" />
+        </div>
+        <Heading level={3}>{title}</Heading>
+        <Text muted className="text-sm leading-6">
+          {children}
+        </Text>
+        {href ? (
+          <span className="mt-auto inline-flex items-center gap-1.5 pt-1 text-xs font-medium text-primary">
+            Read the docs
+            <span className="transition-transform duration-200 group-hover/card:translate-x-0.5">→</span>
+          </span>
+        ) : null}
+      </div>
+    </Card>
+  );
+
   return (
-    <Reveal delay={delay}>
+    <Reveal delay={delay} className="h-full">
       {href ? (
-        <Link href={href} className="block no-underline">
-          <Card variant="elevated">
-            <Stack gap="sm">
-              <Heading level={3}>{title}</Heading>
-              <Text muted className="text-sm leading-6">
-                {children}
-              </Text>
-              <span className="text-xs font-medium text-primary">
-                Read the docs →
-              </span>
-            </Stack>
-          </Card>
+        <Link href={href} className="group/card block h-full no-underline">
+          {body}
         </Link>
       ) : (
-        <Card variant="elevated">
-          <Stack gap="sm">
-            <Heading level={3}>{title}</Heading>
-            <Text muted className="text-sm leading-6">
-              {children}
-            </Text>
-          </Stack>
-        </Card>
+        body
       )}
     </Reveal>
   );
 }
+
+const HERO_SPECS: Array<[string, string]> = [
+  ["Backend", "LLVM 22"],
+  ["Output", "Native binary"],
+  ["Tooling", "LSP · VSIX"],
+];
 
 export default async function Home() {
   const catalog = await getReleaseCatalog();
@@ -67,22 +81,41 @@ export default async function Home() {
 
   return (
     <Container>
-      <Section className="relative flex flex-col justify-center py-16 md:py-24 overflow-hidden">
-        <div className="absolute inset-0 -z-10">
-          <div className="absolute top-0 left-1/3 w-[500px] h-[500px] bg-primary/5 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-0 w-96 h-32 bg-gradient-to-t from-card/40 to-transparent" />
+      <Section className="relative flex flex-col justify-center overflow-hidden py-16 md:py-24">
+        {/* Ambient depth behind the hero */}
+        <div className="pointer-events-none absolute inset-0 -z-10">
+          <div className="absolute -top-28 left-[14%] h-[440px] w-[440px] rounded-full bg-primary/[0.09] blur-[100px]" />
+          <div className="absolute -bottom-32 right-[4%] h-[360px] w-[360px] rounded-full bg-primary/[0.05] blur-[110px]" />
+          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-background to-transparent" />
         </div>
-        <div className="relative flex flex-col items-center justify-center gap-10 md:flex-row md:items-center md:gap-16">
-          <div className="fade-up flex max-w-xl flex-col items-start gap-6 text-left">
-            <p className="m-0 text-[11px] font-medium uppercase tracking-[0.22em] text-primary">
-              Compiled language · native toolchain
+
+        <div className="relative grid items-center gap-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-16">
+          <div className="flex flex-col items-start gap-7">
+            <p className="chip fade-up">
+              <span className="chip-dot" />
+              Compiled language · Native toolchain
             </p>
+
             <div className="flex items-center gap-5 md:gap-7">
-              <div className="relative transition-transform duration-500 group-hover:scale-105">
-                <BrandMark size={104} priority />
-                <div className="absolute -inset-1 bg-primary/10 rounded-full blur-md -z-10 group-hover:bg-primary/20 transition-colors duration-300" />
+              <div className="relative shrink-0">
+                <div className="absolute -inset-5 rounded-full bg-primary/20 blur-2xl" />
+                <div
+                  className="relative rounded-2xl border border-border-strong p-2.5 shadow-xl"
+                  style={{
+                    background:
+                      "linear-gradient(180deg, var(--color-card-elevated-start) 0%, var(--color-card-elevated-end) 100%)",
+                    boxShadow:
+                      "0 1px 0 rgba(255,255,255,0.07) inset, 0 -1px 0 rgba(0,0,0,0.55) inset, 0 18px 38px -14px rgba(0,0,0,0.75)",
+                  }}
+                >
+                  <BrandMark
+                    size={92}
+                    priority
+                    className="relative block drop-shadow-[0_8px_20px_rgba(0,0,0,0.55)]"
+                  />
+                </div>
               </div>
-              <Heading className="text-5xl sm:text-6xl">
+              <Heading className="fade-up text-5xl leading-[1.02] tracking-tight sm:text-6xl">
                 Simple.
                 <br />
                 <span className="hero-compiled">Compiled.</span>
@@ -90,20 +123,43 @@ export default async function Home() {
                 Powerful.
               </Heading>
             </div>
-            <Text muted className="max-w-md text-base leading-7">
+
+            <Text muted className="fade-up fade-up-delay max-w-md text-base leading-7">
               Sere reads like Python and compiles down to native code through LLVM.
               Write it, build it, run it. Same toolchain the whole way, no runtime hiding in the background.
             </Text>
+
             <HomeHeroActions
               downloadHref={downloadHref}
               downloadLabel={downloadLabel}
             />
+
+            <dl className="fade-up grid w-full max-w-md grid-cols-3 gap-px overflow-hidden rounded-lg border border-border-muted bg-border-muted">
+              {HERO_SPECS.map(([label, value]) => (
+                <div
+                  key={label}
+                  className="flex flex-col gap-1 bg-surface-raised/85 px-3.5 py-3"
+                >
+                  <dt className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted/70">
+                    {label}
+                  </dt>
+                  <dd className="m-0 text-[13px] font-medium text-foreground/90">
+                    {value}
+                  </dd>
+                </div>
+              ))}
+            </dl>
           </div>
-          <div className="fade-up fade-up-delay relative flex w-fit max-w-full flex-col items-stretch gap-4">
-            <CodeBlock filename="main.sere">
+
+          <div className="fade-up fade-up-delay relative flex w-full min-w-0 flex-col">
+            <CodeBlock filename="main.sere" wide>
               {highlightSere(CODE_SAMPLE)}
             </CodeBlock>
-            <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-24 h-8 bg-gradient-to-t from-card/50 to-transparent rounded-full blur-sm" />
+            <p className="mt-3.5 text-center font-mono text-[11px] text-muted/70">
+              <span className="text-primary/80">$</span> sere build main.sere
+              <span className="text-muted/40"> → </span>
+              ./main
+            </p>
           </div>
         </div>
       </Section>
@@ -111,22 +167,27 @@ export default async function Home() {
       <Section className="py-16 md:py-20">
         <Stack gap="lg">
           <Reveal>
-            <Heading level={2}>Write once. Run anywhere.</Heading>
-            <Text muted className="max-w-xl">
-              Sere takes your code and turns it into a standalone binary.
-              No interpreter, no virtual machine, no extra runtime to bundle.
-            </Text>
+            <div className="flex flex-col gap-4">
+              <p className="eyebrow">Standalone by design</p>
+              <Heading level={2} className="section-title">
+                Completely standalone.
+              </Heading>
+              <Text muted className="max-w-xl">
+                Sere takes your code and turns it into a standalone binary.
+                No interpreter, no virtual machine, no extra runtime to bundle.
+              </Text>
+            </div>
           </Reveal>
           <Grid cols={3}>
-            <Feature title="Clean syntax">
+            <Feature index={1} title="Clean syntax">
               Definitions, lists, f-strings, and indentation.
               Once you read a few lines, you are already writing.
             </Feature>
-            <Feature title="Native binaries" delay={80}>
+            <Feature index={2} title="Native binaries" delay={80}>
               LLVM 22 backend turns Sere into a real executable.
               Your code runs directly on the machine, nothing in between.
             </Feature>
-            <Feature title="When you need it" delay={160}>
+            <Feature index={3} title="When you need it" delay={160}>
               Unique and Shared pointers, structs, enums, and macros.
               Drop down to systems level work without leaving the language.
             </Feature>
@@ -137,31 +198,36 @@ export default async function Home() {
       <Section className="py-16 md:py-20">
         <Stack gap="lg">
           <Reveal>
-            <Heading level={2}>The pieces that matter</Heading>
+            <div className="flex flex-col gap-4">
+              <p className="eyebrow">Language surface</p>
+              <Heading level={2} className="section-title">
+                The pieces that matter
+              </Heading>
+            </div>
           </Reveal>
           <Grid cols={3}>
-            <Feature title="Real types" href="/docs/types">
+            <Feature index={1} title="Real types" href="/docs/types">
               i8 through i64, f32 and f64, list[T], dict[K, V], Unique[T],
               and structs that copy by value. Checked at compile time, so you find out
               before you run it.
             </Feature>
-            <Feature title="Macros" href="/docs/macros" delay={80}>
+            <Feature index={2} title="Macros" href="/docs/macros" delay={80}>
               Quote bodies and call name!(...) when you need them.
               Generate code at compile time without leaving Sere.
             </Feature>
-            <Feature title="Memory control" href="/docs/memory" delay={160}>
+            <Feature index={3} title="Memory control" href="/docs/memory" delay={160}>
               unique, shared, alloc, and free give you a choice.
               Plug in mark-sweep, arena allocation, or write your own collector.
             </Feature>
-            <Feature title="Clear errors" href="/docs/errors">
+            <Feature index={4} title="Clear errors" href="/docs/errors">
               TypeError, NameError, AttributeError. Names that actually tell you what broke.
               Diagnostics point at the exact spot, not just the line above it.
             </Feature>
-            <Feature title="Editor support" href="/docs/diagnostics" delay={80}>
+            <Feature index={5} title="Editor support" href="/docs/diagnostics" delay={80}>
               LSP for Cursor and VS Code handles highlighting, go-to-definition,
               hover, rename, and the usual # type: ignore escape hatch.
             </Feature>
-            <Feature title="Libraries" href="/docs/libraries" delay={160}>
+            <Feature index={6} title="Libraries" href="/docs/libraries" delay={160}>
               Pack a project into a .slib and drop it in libs/.
               Native C in the library compiles into the same file.
             </Feature>

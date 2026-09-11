@@ -1,14 +1,21 @@
 import { projectKindLabel, type ProjectKind } from "@/app/lib/projects";
 
 export default function KindBadge({ kind }: { kind: ProjectKind }) {
+  const isLib = kind === "lib";
+
   return (
     <span
-      className={`inline-flex items-center rounded-sm px-2 py-0.5 text-[11px] font-medium ${
-        kind === "lib"
-          ? "bg-accent/10 text-accent"
-          : "bg-primary/15 text-primary-hover"
+      className={`badge shrink-0 gap-1.5 text-[11px] font-medium ${
+        isLib ? "text-accent" : "text-primary-hover"
       }`}
     >
+      <span
+        className={`h-1.5 w-1.5 rounded-full ${
+          isLib
+            ? "bg-accent shadow-[0_0_6px_rgba(231,210,199,0.8)]"
+            : "bg-primary shadow-[0_0_6px_rgba(196,88,74,0.9)]"
+        }`}
+      />
       {projectKindLabel(kind)}
     </span>
   );

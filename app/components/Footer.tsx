@@ -1,8 +1,8 @@
 "use client";
 
+import { isProjectEditorPath } from "@/app/lib/routes";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { isProjectEditorPath } from "@/app/lib/routes";
 import BrandMark from "./BrandMark";
 
 export default function Footer() {
@@ -13,26 +13,25 @@ export default function Footer() {
   }
 
   return (
-    <footer className="border-t border-border-muted mt-16" style={{
-      borderTopColor: "var(--color-border-muted)",
-      background: "linear-gradient(180deg, transparent 0%, rgba(12, 14, 16, 0.5) 100%)"
-    }}>
-      <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-6 px-6 py-8">
+    <footer className="relative mt-20 border-t border-border-muted">
+      <span className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/25 to-transparent" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/[0.012] to-transparent" />
+      <div className="relative mx-auto flex w-full max-w-6xl items-center justify-between gap-6 px-6 py-9">
         <Link
           href="/"
-          className="flex items-center gap-2.5 text-sm text-muted no-underline hover:text-primary hover:no-underline transition-colors"
+          className="group flex items-center gap-2.5 text-sm text-muted no-underline transition-colors hover:text-primary hover:no-underline"
         >
-          <BrandMark alt="" size={28} />
+          <BrandMark alt="" size={28} className="transition-transform duration-300 group-hover:scale-105" />
           <span className="font-medium tracking-tight">Sere</span>
         </Link>
-        <nav className="flex items-center gap-4 text-xs text-muted">
-          <Link href="https://github.com/Sere-Language/sere" className="text-muted hover:text-primary hover:no-underline transition-colors">
+        <nav className="flex items-center gap-1 text-xs text-muted">
+          <Link href="https://github.com/Sere-Language/sere" className="rounded-md px-2.5 py-1.5 text-muted no-underline transition-colors hover:bg-white/[0.04] hover:text-foreground hover:no-underline">
             GitHub
           </Link>
-          <Link href="/docs" className="text-muted hover:text-primary hover:no-underline transition-colors">
+          <Link href="/docs" className="rounded-md px-2.5 py-1.5 text-muted no-underline transition-colors hover:bg-white/[0.04] hover:text-foreground hover:no-underline">
             Docs
           </Link>
-          <Link href="/community" className="text-muted hover:text-primary hover:no-underline transition-colors">
+          <Link href="/community" className="rounded-md px-2.5 py-1.5 text-muted no-underline transition-colors hover:bg-white/[0.04] hover:text-foreground hover:no-underline">
             Community
           </Link>
         </nav>
