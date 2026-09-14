@@ -8,12 +8,21 @@ import PageIntro from "../components/PageIntro";
 import Reveal from "../components/Reveal";
 import Stack from "../components/Stack";
 import Text from "../components/Text";
+import { pageMetadata } from "../lib/seo";
 import { highlightSere } from "../utils/highlight";
 
-export const metadata: Metadata = {
-  title: "Libraries - Sere",
-  description: "Standard library modules and drop-in .slib packages.",
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Libraries",
+  description:
+    "Every Sere standard library module — io, fs, math, memory, requests, wsgi, and more — plus how to pack your own code into a drop-in .slib package.",
+  path: "/libraries",
+  keywords: [
+    "Sere libraries",
+    "Sere standard library",
+    "Sere modules",
+    "slib package",
+  ],
+});
 
 const MODULES = [
   { name: "prelude", body: "Always injected: print, abs, min, max, Int / Float, dbg!." },

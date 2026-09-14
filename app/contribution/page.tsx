@@ -7,11 +7,15 @@ import PageIntro from "../components/PageIntro";
 import Reveal from "../components/Reveal";
 import Stack from "../components/Stack";
 import Text from "../components/Text";
+import { pageMetadata } from "../lib/seo";
 
-export const metadata: Metadata = {
-  title: "Contribution - Sere",
-  description: "How to contribute to the Sere compiler, runtime, and tooling.",
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Contribute",
+  description:
+    "How to contribute to Sere: pick a small patch in the compiler, runtime, standard library, or editor tooling, and get it reviewed in the open.",
+  path: "/contribution",
+  keywords: ["contribute to Sere", "Sere source code", "Sere pull request"],
+});
 
 const PILLARS = [
   {

@@ -5,24 +5,36 @@ import CodeBlock from "../components/CodeBlock";
 import Container from "../components/Container";
 import Grid from "../components/Grid";
 import Heading from "../components/Heading";
+import JsonLd from "../components/JsonLd";
 import ReleaseCard from "../components/ReleaseCard";
 import Reveal from "../components/Reveal";
 import Section from "../components/Section";
 import Stack from "../components/Stack";
 import Text from "../components/Text";
 import {
-  formatBytes,
-  formatReleaseDate,
-  getReleaseCatalog,
-  recommendedRelease,
-  SERE_GITHUB_REPO,
-  SERE_RELEASES_PAGE,
+    formatBytes,
+    formatReleaseDate,
+    getReleaseCatalog,
+    recommendedRelease,
+    SERE_GITHUB_REPO,
+    SERE_RELEASES_PAGE,
 } from "../lib/release";
+import { pageMetadata, softwareApplicationJsonLd } from "../lib/seo";
 
-export const metadata: Metadata = {
-  title: "Install - Sere",
-  description: "Install the Sere toolchain, put it on PATH, and compile a native binary.",
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Install",
+  description:
+    "Download the Sere compiler for Windows or Linux, put it on your PATH, and compile your first standalone native binary. Every command in the toolchain, plus the build-from-source prerequisites.",
+  path: "/install",
+  keywords: [
+    "install Sere",
+    "Sere download",
+    "Sere compiler download",
+    "Sere Windows installer",
+    "Sere Linux",
+    "build Sere from source",
+  ],
+});
 
 export const revalidate = 300;
 
@@ -81,6 +93,14 @@ export default async function InstallPage() {
 
   return (
     <Container>
+      <JsonLd
+        data={softwareApplicationJsonLd({
+          version: recommended?.tag ?? null,
+          downloadUrl: recommended?.installer?.url ?? recommended?.zip?.url ?? "/install",
+          releaseNotesUrl: recommended?.pageUrl ?? SERE_RELEASES_PAGE,
+          datePublished: recommended?.publishedAt ?? null,
+        })}
+      />
       <Section className="pt-12 pb-10">
         <Stack gap="lg">
           <Stack gap="sm">

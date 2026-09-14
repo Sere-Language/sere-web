@@ -3,6 +3,8 @@ import type { NextConfig } from "next";
 const nodeFsStub = "./app/lib/nodeFsStub.ts";
 
 const nextConfig: NextConfig = {
+  // Don't advertise the framework on every response.
+  poweredByHeader: false,
   transpilePackages: ["@userland-run/nano-sdk"],
   turbopack: {
     resolveAlias: {
@@ -34,7 +36,21 @@ const nextConfig: NextConfig = {
     }
     return config;
   },
+  redirects: async () => [
+    {
+      // Consolidate the www host onto the canonical apex domain.
+      source: "/:path*",
+      has: [{ type: "host", value: "www.sere-lang.com" }],
+      destination: "https://sere-lang.com/:path*",
+      permanent: true,
+    },
+  ],
   headers: async () => [
+    {
+      // JSON endpoints have no search value; keep them out of the index.
+      source: "/api/:path*",
+      headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+    },
     {
       source: "/cloud/projects/:path*",
       headers: [
@@ -46,6 +62,13 @@ const nextConfig: NextConfig = {
       source: "/nano/:path*",
       headers: [
         { key: "Cross-Origin-Resource-Policy", value: "cross-origin" },
+      ],
+    },
+    {
+      source: "/(.*)",
+      headers: [
+        { key: "X-Content-Type-Options", value: "nosniff" },
+        { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
       ],
     },
   ],

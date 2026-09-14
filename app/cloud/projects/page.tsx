@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import NewProjectMenu from "../../components/NewProjectMenu";
 import Container from "../../components/Container";
+import NewProjectMenu from "../../components/NewProjectMenu";
 import Section from "../../components/Section";
+import { pageMetadata } from "../../lib/seo";
 
-export const metadata: Metadata = {
-  title: "Projects - Sere Cloud",
+export const metadata: Metadata = pageMetadata({
+  title: "Projects",
   description: "Create and open Sere Cloud projects.",
-};
+  path: "/cloud/projects",
+  noIndex: true,
+});
 
 export default function CloudProjectsPage() {
   return (

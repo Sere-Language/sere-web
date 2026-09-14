@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Button from "../components/Button";
 import Card from "../components/Card";
-import Container from "../components/Container";
 import Grid from "../components/Grid";
 import Heading from "../components/Heading";
 import PageIntro from "../components/PageIntro";
@@ -9,11 +8,15 @@ import Reveal from "../components/Reveal";
 import Section from "../components/Section";
 import Stack from "../components/Stack";
 import Text from "../components/Text";
+import { pageMetadata } from "../lib/seo";
 
-export const metadata: Metadata = {
-  title: "Issues - Sere",
-  description: "View and track issues from the Sere GitHub repository.",
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Issues",
+  description:
+    "Every open and closed issue in the Sere repository, pulled live from GitHub — bugs, language questions, and feature requests.",
+  path: "/issues",
+  keywords: ["Sere issues", "Sere bug tracker", "Sere GitHub issues"],
+});
 
 const GITHUB_ISSUES_API = "https://api.github.com/repos/Sere-Language/sere/issues?state=all&per_page=30";
 

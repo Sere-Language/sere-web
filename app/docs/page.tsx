@@ -1,14 +1,26 @@
 import type { Metadata } from "next";
-import DocMarkdown from "../components/docs/Markdown";
 import DocToc from "../components/docs/DocToc";
 import DocsPager from "../components/docs/DocsPager";
+import DocMarkdown from "../components/docs/Markdown";
 import { getDoc, neighbors } from "../lib/docs";
+import { pageMetadata } from "../lib/seo";
 
-export const metadata: Metadata = {
-    title: "Docs - Sere",
-    description: "Language reference as the Sere compiler implements it.",
-  };
-  export const revalidate = 300;
+export const metadata: Metadata = pageMetadata({
+  title: "Documentation",
+  description:
+    "The complete Sere language reference: types, memory and pointers, macros, expressions, records, modules, the standard library, and interop — documented as the compiler implements it.",
+  path: "/docs",
+  keywords: [
+    "Sere documentation",
+    "Sere language reference",
+    "Sere syntax",
+    "Sere types",
+    "Sere standard library",
+    "Sere tutorial",
+  ],
+});
+
+export const revalidate = 300;
 
 async function Page() {
   const doc = await getDoc("index");

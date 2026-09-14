@@ -7,11 +7,15 @@ import PageIntro from "../components/PageIntro";
 import Reveal from "../components/Reveal";
 import Stack from "../components/Stack";
 import Text from "../components/Text";
+import { pageMetadata } from "../lib/seo";
 
-export const metadata: Metadata = {
-  title: "Community - Sere",
-  description: "Follow releases, file issues, and talk through design in the open.",
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Community",
+  description:
+    "Sere is developed in the open. Follow releases, file issues, join design discussions, and contribute to the compiler, stdlib, and tooling.",
+  path: "/community",
+  keywords: ["Sere community", "Sere GitHub", "Sere discussions"],
+});
 
 export default function CommunityPage() {
   return (

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import BrandMark from "./components/BrandMark";
 import Card from "./components/Card";
@@ -6,15 +7,67 @@ import Container from "./components/Container";
 import Grid from "./components/Grid";
 import Heading from "./components/Heading";
 import HomeHeroActions from "./components/HomeHeroActions";
+import JsonLd from "./components/JsonLd";
 import Reveal from "./components/Reveal";
 import Section from "./components/Section";
 import Stack from "./components/Stack";
 import Text from "./components/Text";
 import { getReleaseCatalog, recommendedRelease } from "./lib/release";
+import {
+  SITE_DESCRIPTION,
+  SITE_TITLE,
+  faqJsonLd,
+  pageMetadata,
+  softwareApplicationJsonLd,
+} from "./lib/seo";
 import { CODE_SAMPLE } from "./utils/code";
 import { highlightSere } from "./utils/highlight";
 
 export const revalidate = 300;
+
+export const metadata: Metadata = pageMetadata({
+  title: SITE_TITLE,
+  description: SITE_DESCRIPTION,
+  path: "/",
+  absoluteTitle: true,
+});
+
+/**
+ * Answers are kept in one place so the visible section and the FAQPage
+ * structured data can never disagree.
+ */
+const FAQS = [
+  {
+    question: "What is Sere?",
+    answer:
+      "Sere is a statically typed, indentation-significant programming language that reads like Python and compiles to native code. It is built for people who want a small, readable language without giving up control over memory or performance.",
+  },
+  {
+    question: "Does Sere need a runtime or a virtual machine?",
+    answer:
+      "No. Sere compiles your source into a standalone native binary. There is no interpreter, virtual machine, or runtime to bundle with your program — the build output is a real executable.",
+  },
+  {
+    question: "What does Sere compile to?",
+    answer:
+      "Sere lowers to LLVM 22 IR and then to native machine code. sere build main.sere produces ./main, and sere --emit-llvm or sere --emit-asm let you inspect the intermediate output.",
+  },
+  {
+    question: "How do I install the Sere toolchain?",
+    answer:
+      "Download the Windows installer or a release archive from the install page, then put the compiler on your PATH. Building from source needs CMake 3.28+, Ninja 1.11+, Visual Studio 2022 Build Tools, and the LLVM 22.1.8 clang+llvm archive.",
+  },
+  {
+    question: "Is there editor support for Sere?",
+    answer:
+      "Yes. The toolchain ships a language server (sere --lsp) and a VS Code extension with highlighting, go-to-definition, hover, and rename. The extension also works in Cursor.",
+  },
+  {
+    question: "How do I add a third-party library?",
+    answer:
+      "Pack a project with sere pack to produce a .slib file, then drop it in your project's libs/ directory. The standard library ships with the compiler, and there is no package manager yet.",
+  },
+] as const;
 
 function Feature({
   title,
@@ -81,6 +134,22 @@ export default async function Home() {
 
   return (
     <Container>
+      <JsonLd
+        data={[
+          softwareApplicationJsonLd({
+            version: featured?.tag ?? null,
+            downloadUrl: downloadHref,
+            releaseNotesUrl: featured?.pageUrl ?? null,
+            datePublished: featured?.publishedAt ?? null,
+          }),
+          faqJsonLd(
+            FAQS.map((faq) => ({
+              question: faq.question,
+              answer: faq.answer,
+            })),
+          ),
+        ]}
+      />
       <Section className="relative flex flex-col justify-center overflow-hidden py-16 md:py-24">
         {/* Ambient depth behind the hero */}
         <div className="pointer-events-none absolute inset-0 -z-10">
@@ -116,11 +185,17 @@ export default async function Home() {
                 </div>
               </div>
               <Heading className="fade-up text-5xl leading-[1.02] tracking-tight sm:text-6xl">
-                Simple.
-                <br />
-                <span className="hero-compiled">Compiled.</span>
-                <br />
-                Powerful.
+                <span className="sr-only">
+                  Sere: a Python-like programming language that compiles to
+                  native code.
+                </span>
+                <span aria-hidden="true">
+                  Simple.
+                  <br />
+                  <span className="hero-compiled">Compiled.</span>
+                  <br />
+                  Powerful.
+                </span>
               </Heading>
             </div>
 
@@ -231,6 +306,44 @@ export default async function Home() {
               Pack a project into a .slib and drop it in libs/.
               Native C in the library compiles into the same file.
             </Feature>
+          </Grid>
+        </Stack>
+      </Section>
+
+      <Section className="py-16 md:py-20">
+        <Stack gap="lg">
+          <Reveal>
+            <div className="flex flex-col gap-4">
+              <p className="eyebrow">Questions</p>
+              <Heading level={2} className="section-title">
+                Frequently asked
+              </Heading>
+              <Text muted className="max-w-xl">
+                The short answers. Deeper detail lives in the{" "}
+                <Link href="/docs" className="text-primary no-underline hover:underline">
+                  documentation
+                </Link>{" "}
+                and the{" "}
+                <Link href="/install" className="text-primary no-underline hover:underline">
+                  install guide
+                </Link>
+                .
+              </Text>
+            </div>
+          </Reveal>
+          <Grid cols={2}>
+            {FAQS.map((faq, index) => (
+              <Reveal key={faq.question} delay={index * 60} className="h-full">
+                <Card variant="elevated" className="h-full">
+                  <Stack gap="sm">
+                    <Heading level={3}>{faq.question}</Heading>
+                    <Text muted className="text-sm leading-6">
+                      {faq.answer}
+                    </Text>
+                  </Stack>
+                </Card>
+              </Reveal>
+            ))}
           </Grid>
         </Stack>
       </Section>
