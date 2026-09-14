@@ -161,6 +161,7 @@ export function organizationJsonLd() {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
+    "@id": `${SITE_URL}/#organization`,
     name: SITE_NAME,
     alternateName: "Sere Programming Language",
     url: SITE_URL,
@@ -169,6 +170,12 @@ export function organizationJsonLd() {
       url: absoluteUrl("/sere-mark.png"),
     },
     description: SITE_LONG_DESCRIPTION,
+    knowsAbout: [
+      "Programming languages",
+      "Compiler construction",
+      "LLVM",
+      "Systems programming",
+    ],
     sameAs: [SERE_GITHUB_REPO, SERE_GITHUB_ORG],
   };
 }
@@ -177,6 +184,7 @@ export function websiteJsonLd() {
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
+    "@id": `${SITE_URL}/#website`,
     name: SITE_NAME,
     alternateName: `${SITE_NAME} Programming Language`,
     url: SITE_URL,
@@ -184,6 +192,75 @@ export function websiteJsonLd() {
     inLanguage: SITE_LANGUAGE,
     publisher: {
       "@type": "Organization",
+      "@id": `${SITE_URL}/#organization`,
+      name: SITE_NAME,
+      url: SITE_URL,
+    },
+    about: { "@id": `${SITE_URL}/#sere` },
+  };
+}
+
+/* ------------------------------------------------------------------ */
+/* Language identity — the entity-disambiguation payload              */
+/* ------------------------------------------------------------------ */
+
+/** Alternative names retrieval engines should fold onto the same entity. */
+export const SERE_ALTERNATE_NAMES = [
+  "Sere language",
+  "Sere programming language",
+  "Sere lang",
+  "sere-lang",
+  "Sere compiler",
+];
+
+/**
+ * "Sere" is a crowded namespace — U.S. military SERE training, seral ecological
+ * stages, the town of Sère in France, and more. Every knowledge-graph node we
+ * publish carries this sentence so retrieval systems stop conflating them.
+ */
+export const SERE_DISAMBIGUATION =
+  "Sere (also written sere-lang) is a compiled, statically typed programming language with Python-like indentation-based syntax that builds standalone native binaries through LLVM. It is unrelated to U.S. military SERE (Survival, Evasion, Resistance, and Escape) training, to seral stages in ecology, or to any other entity that shares the name.";
+
+/** The language itself, as a knowledge-graph entity. */
+export function computerLanguageJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ComputerLanguage",
+    "@id": `${SITE_URL}/#sere`,
+    name: SITE_NAME,
+    alternateName: SERE_ALTERNATE_NAMES,
+    description: SITE_LONG_DESCRIPTION,
+    disambiguatingDescription: SERE_DISAMBIGUATION,
+    url: SITE_URL,
+    sameAs: [SERE_GITHUB_REPO, SERE_GITHUB_ORG],
+  };
+}
+
+export interface SoftwareSourceCodeJsonLdInput {
+  version?: string | null;
+}
+
+/** The open-source compiler, stdlib, and tooling that implement the language. */
+export function softwareSourceCodeJsonLd({
+  version,
+}: SoftwareSourceCodeJsonLdInput = {}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "SoftwareSourceCode",
+    "@id": `${SITE_URL}/#source-code`,
+    name: `${SITE_NAME} compiler`,
+    description:
+      "The Sere compiler, runtime, standard library, and language server.",
+    codeRepository: SERE_GITHUB_REPO,
+    programmingLanguage: { "@id": `${SITE_URL}/#sere` },
+    runtimePlatform: "Windows, Linux, macOS",
+    codeSampleType: "full",
+    ...(version ? { version } : {}),
+    license: `${SERE_GITHUB_REPO}/blob/main/LICENSE`,
+    targetProduct: { "@id": `${SITE_URL}/#app` },
+    author: {
+      "@type": "Organization",
+      "@id": `${SITE_URL}/#organization`,
       name: SITE_NAME,
       url: SITE_URL,
     },
@@ -206,6 +283,7 @@ export function softwareApplicationJsonLd({
   return {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
+    "@id": `${SITE_URL}/#app`,
     name: SITE_NAME,
     alternateName: "Sere programming language",
     applicationCategory: "DeveloperApplication",

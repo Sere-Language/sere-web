@@ -345,6 +345,18 @@ export default async function Home() {
               </Reveal>
             ))}
           </Grid>
+          <Reveal>
+            <Text muted className="max-w-xl">
+              Coming from Python?{" "}
+              <Link
+                href="/docs/sere-vs-python"
+                className="text-primary no-underline hover:underline"
+              >
+                See how Sere compares
+              </Link>
+              .
+            </Text>
+          </Reveal>
         </Stack>
       </Section>
 

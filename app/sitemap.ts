@@ -34,8 +34,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     const docs = await listDocs();
     docEntries = docs
-      // The "index" doc is served at /docs, which is already listed above.
-      .filter((doc) => doc.slug !== "index")
+      // "index" is served at /docs, and "README" is a repository artifact
+      // rather than a page readers should land on from search.
+      .filter(
+        (doc) =>
+          doc.slug !== "index" && doc.slug.toLowerCase() !== "readme",
+      )
       .map((doc) => ({
         url: absoluteUrl(doc.href),
         lastModified: doc.lastModified ? new Date(doc.lastModified) : now,

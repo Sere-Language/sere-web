@@ -2,15 +2,19 @@ import Link from "next/link";
 import type { Components } from "react-markdown";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import CodeBlock from "../CodeBlock";
-import { highlightSere } from "../../utils/highlight";
 import { slugify } from "../../lib/docs";
+import { highlightSere } from "../../utils/highlight";
+import CodeBlock from "../CodeBlock";
 
 function rewriteHref(href: string | undefined): string | undefined {
   if (!href) return href;
   if (href.startsWith("http://") || href.startsWith("https://") || href.startsWith("#")) {
     return href;
   }
+
+  // Root-relative links already name a site route (e.g. /install, /docs/types),
+  // so pass them through instead of treating them as a doc slug.
+  if (href.startsWith("/")) return href;
 
   const [file, hash] = href.split("#");
   const slug = (file ?? "").replace(/^\.\//, "").replace(/\.md$/, "");

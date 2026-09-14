@@ -12,7 +12,9 @@ import {
   SITE_NAME,
   SITE_TITLE,
   SITE_URL,
+  computerLanguageJsonLd,
   organizationJsonLd,
+  softwareSourceCodeJsonLd,
   websiteJsonLd,
 } from "./lib/seo";
 
@@ -101,7 +103,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       data-scroll-behavior="smooth"
     >
       <body>
-        <JsonLd data={[organizationJsonLd(), websiteJsonLd()]} />
+        <JsonLd
+          data={[
+            organizationJsonLd(),
+            websiteJsonLd(),
+            computerLanguageJsonLd(),
+            softwareSourceCodeJsonLd(),
+          ]}
+        />
         <a href="#main-content" className="skip-link">
           Skip to content
         </a>
