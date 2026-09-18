@@ -136,20 +136,29 @@ Environment changes only apply to a new deployment: after adding or editing thes
 To check a deployment without publishing anything:
 
 ```bash
-curl -s https://sere-lang.com/api/packages | jq .status
+curl -s https://sere-lang.com/api/registry/status \
+  -H "x-publish-token: $PACKAGE_PUBLISH_TOKEN" | jq
 ```
+
+The report is for whoever operates the deployment, so it requires a credential: the shared `PACKAGE_PUBLISH_TOKEN`, or any developer publish token as `Authorization: Bearer …`. Without one it answers `401` and says nothing about the deployment.
 
 ```json
 {
-  "supabase": true,
-  "serviceRole": true,
-  "sharedPublishToken": false,
-  "autoConfirm": true,
-  "publishProblem": null
+  "config": {
+    "supabase": true,
+    "serviceRole": true,
+    "sharedPublishToken": false,
+    "autoConfirm": true,
+    "publishProblem": null,
+    "publishDiagnosis": null
+  },
+  "checks": [{ "name": "packages table, public read", "ok": true, "detail": null }],
+  "diagnosis": "The registry is ready: reads, tokens, storage and the rate limiter all answered.",
+  "ready": true
 }
 ```
 
-`publishProblem` names the exact missing piece when publishing is unavailable, and the same sentence is returned by `POST /api/packages` as its `503` message.
+`publishDiagnosis` names the exact variable and fix when publishing is unavailable. `publishProblem` is the same problem phrased for the public, and it is what `POST /api/packages` returns as its `503` message — no deployment detail reaches an API caller or a page visitor.
 
 ## Related
 

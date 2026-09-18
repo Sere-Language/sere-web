@@ -232,8 +232,17 @@ export interface RegistryStatus {
   sharedPublishToken: boolean;
   /** Accounts are activated without email. */
   autoConfirm: boolean;
-  /** Why publishing is unavailable, or null when it is ready. */
+    /**
+     * Why publishing is unavailable, or null when it is ready.
+     *
+     * This string is returned by public endpoints, so it must never name an
+     * environment variable, a provider, or a file: it says only that the
+     * deployment is unable to publish. `publishDiagnosis` carries the operator
+     * detail and is served exclusively by the token-gated status endpoint.
+     */
   publishProblem: string | null;
+    /** The same problem in operator terms — variable names and the exact fix. */
+    publishDiagnosis: string | null;
 }
 
 /**
@@ -245,15 +254,23 @@ export function registryStatus(): RegistryStatus {
   const kind = serviceKeyKind();
 
   let publishProblem: string | null = null;
+    let publishDiagnosis: string | null = null;
+
   if (!supabase) {
     publishProblem =
-      "This deployment has no Supabase project configured, so the registry cannot store anything. The site operator needs to set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY, then redeploy.";
+          "Publishing is unavailable because this deployment is not connected to a registry.";
+      publishDiagnosis =
+          "No Supabase project is configured, so the registry cannot store anything. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY, then redeploy.";
   } else if (kind === "missing") {
     publishProblem =
-      "This deployment is missing SUPABASE_SERVICE_ROLE_KEY, the server-side key publishing writes with, so no package can be stored. The site operator needs to add it to the deployment environment and redeploy.";
+          "Publishing is unavailable because this deployment is missing its server-side registry key.";
+      publishDiagnosis =
+          "SUPABASE_SERVICE_ROLE_KEY is missing, so nothing can be written. Add it to the deployment environment and redeploy.";
   } else if (kind === "public-key") {
     publishProblem =
-      "SUPABASE_SERVICE_ROLE_KEY holds a publishable key rather than the secret one, so writes are refused. The site operator needs to replace it with the secret (service_role) key and redeploy.";
+          "Publishing is unavailable because this deployment's server-side registry key is the wrong one.";
+      publishDiagnosis =
+          "SUPABASE_SERVICE_ROLE_KEY holds a publishable key rather than the secret one, so writes are refused. Replace it with the secret (service_role) key and redeploy.";
   }
 
   return {
@@ -264,5 +281,6 @@ export function registryStatus(): RegistryStatus {
       (envValue("DEVELOPER_AUTO_CONFIRM") ?? "").toLowerCase(),
     ),
     publishProblem,
+      publishDiagnosis,
   };
 }

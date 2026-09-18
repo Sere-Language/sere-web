@@ -72,7 +72,6 @@ export default async function LibrariesPage() {
 
   return (
     <PageIntro
-      eyebrow="Packages"
       title="Libraries"
       description="Search every package published to the Sere registry. Install one with sere add, or push your own with the publish API. The standard library still ships with the compiler — everything in the list above is a package you opt into."
     >

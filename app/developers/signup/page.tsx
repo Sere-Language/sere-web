@@ -17,7 +17,6 @@ export const metadata: Metadata = pageMetadata({
 export default function DeveloperSignupPage() {
   return (
     <PageIntro
-      eyebrow="Developers"
       title="Create an account"
       description="Publish packages to the Sere registry. One account, as many tokens as you need."
     >

@@ -57,7 +57,6 @@ const HOW_TO = [
 export default function ContributionPage() {
   return (
     <PageIntro
-      eyebrow="Open source"
       title="Contribution"
       description="The compiler, runtime, stdlib, and editor tooling all take patches. Start with something small and keep it typed."
     >

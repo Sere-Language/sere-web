@@ -147,7 +147,6 @@ function EmptyState({
   if (query && hasPackages) {
     return (
       <div className="border-l-2 border-border-strong py-0.5 pl-5">
-        <p className="eyebrow">No matches</p>
         <p className="m-0 mt-3 text-sm text-muted-foreground">
           Nothing in the registry matches{" "}
           <span className="font-mono text-foreground">{query}</span>. Try a shorter
@@ -167,28 +166,19 @@ function EmptyState({
   if (!registryConfigured) {
     return (
       <div className="border-l-2 border-primary/50 py-0.5 pl-5">
-        <p className="eyebrow">Registry offline</p>
         <p className="m-0 mt-3 text-sm text-muted-foreground">
-          Nothing is listed because this deployment has no registry behind it yet.
+          Nothing published yet. Packages uploaded to the registry show up here,
+          with their versions and install commands.
         </p>
-        <ol className="m-0 mt-3 flex list-decimal flex-col gap-2 pl-5 text-sm text-muted-foreground">
-          <li>
-            Create a Supabase project, then paste <code>supabase/schema.sql</code> into the
-            SQL editor.
-          </li>
-          <li>
-            Set <code>NEXT_PUBLIC_SUPABASE_URL</code> and{" "}
-            <code>NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY</code> in <code>.env</code>.
-          </li>
-          <li>Reload this page — published packages appear here.</li>
-        </ol>
+        <Link href="/docs/publishing" className="text-sm text-primary no-underline">
+          How publishing works
+        </Link>
       </div>
     );
   }
 
   return (
     <div className="border-l-2 border-primary/50 py-0.5 pl-5">
-      <p className="eyebrow">Empty registry</p>
       <p className="m-0 mt-3 text-sm text-muted-foreground">
         The registry is live and waiting for its first upload. Create a developer
         account, issue a publish token, then push an archive:

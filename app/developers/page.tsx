@@ -41,20 +41,20 @@ export default async function DevelopersPage() {
   if (!status.supabase) {
     return (
       <PageIntro
-        eyebrow="Developers"
         title="Developer accounts"
-        description="Accounts are not available on this deployment yet."
+        description="Accounts are not open on this deployment yet."
       >
         <Card variant="panel">
           <Stack gap="sm">
-            <Heading level={3}>One-time setup</Heading>
+            <Heading level={3}>Not open yet</Heading>
             <Text muted className="text-sm leading-6">
-              Paste <code>supabase/schema.sql</code> into the database SQL editor,
-              then set <code>NEXT_PUBLIC_SUPABASE_URL</code>,{" "}
-              <code>NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY</code> and{" "}
-              <code>SUPABASE_SERVICE_ROLE_KEY</code> on the server. Everything
-              else — accounts, tokens, publishing — runs through this site.
+              Publishing accounts and the package registry are part of this site,
+              and they are not switched on here yet. There is nothing to install
+              or configure on your side — check back shortly.
             </Text>
+            <Button href="/libraries" variant="secondary" className="mt-1">
+              Browse packages
+            </Button>
           </Stack>
         </Card>
       </PageIntro>
@@ -64,7 +64,6 @@ export default async function DevelopersPage() {
   if (!session) {
     return (
       <PageIntro
-        eyebrow="Developers"
         title="Publish packages"
         description="Create an account to publish to the Sere registry. You get a handle, a dashboard and publish tokens — no third-party accounts to wire up, no keys to copy out of a console."
       >
@@ -137,7 +136,6 @@ export default async function DevelopersPage() {
 
   return (
     <PageIntro
-      eyebrow="Developer"
       title={developer.handle ? `@${developer.handle}` : "Your account"}
       description={`Signed in as ${developer.email ?? "your account"}. Manage publish tokens below, then push packages with them.`}
     >
@@ -162,14 +160,11 @@ export default async function DevelopersPage() {
       {status.publishProblem ? (
         <Card variant="panel">
           <Stack gap="sm">
-            <Heading level={3}>Publishing is not enabled</Heading>
+            <Heading level={3}>Publishing is paused</Heading>
             <Text muted className="text-sm leading-6">
-              {status.publishProblem}
-            </Text>
-            <Text muted className="text-sm leading-6">
-              Tokens below can still be created, but every publish will come back
-              with <code>503</code> until this is fixed. Environment changes only
-              reach a new deployment, so redeploying is part of the fix.
+              The registry is not accepting uploads at the moment. You can still
+              create a token below — publishes will return <code>503</code> until
+              it is back.
             </Text>
           </Stack>
         </Card>

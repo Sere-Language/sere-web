@@ -16,7 +16,6 @@ export const metadata: Metadata = pageMetadata({
 export default function DeveloperLoginPage() {
   return (
     <PageIntro
-      eyebrow="Developers"
       title="Sign in"
       description="Sign in to manage your publish tokens and packages."
     >

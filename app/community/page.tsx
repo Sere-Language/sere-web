@@ -20,7 +20,6 @@ export const metadata: Metadata = pageMetadata({
 export default function CommunityPage() {
   return (
     <PageIntro
-      eyebrow="Open work"
       title="Community"
       description="The compiler, stdlib, examples, and this site all live in one repository. File issues there, read the release notes, and join the design conversations."
     >

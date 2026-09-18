@@ -231,7 +231,7 @@ Use `--fail-with-body` so a rejected publish fails the job and prints the reason
 | `413` | The archive is over 25 MB, or the README is over 64 KB. | Trim the payload — the registry is for libraries, not build output. |
 | `415` | The request was not `multipart/form-data`. | Send the fields shown above; `-F` does this for you. |
 | `429` | Rate limited. | The response carries `Retry-After` and `ratelimit-reset`. Back off and retry. |
-| `503` | The deployment cannot write to the registry — usually a missing or wrong server key. The message names the variable. | Operator problem: set `SUPABASE_SERVICE_ROLE_KEY` to the secret key (not the publishable one) and redeploy. `GET /api/packages` reports the same diagnosis in its `status` field. |
+| `503` | Publishing or token checking is unavailable on the deployment. | Nothing to fix in your request. Retry later — if you run the deployment, `GET /api/registry/status` with a publish token reports the cause. |
 
 ### If the token is refused
 

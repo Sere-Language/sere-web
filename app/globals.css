@@ -391,7 +391,7 @@ pre code .tok-function {
     box-shadow: var(--shadow-xl), var(--bevel-top-strong), var(--bevel-bottom);
   }
 
-  /* Small engraved label — eyebrow / meta chips */
+  /* Small label chip */
   .chip {
     display: inline-flex;
     align-items: center;
@@ -406,17 +406,8 @@ pre code .tok-function {
     color: var(--color-muted);
     font-size: 11px;
     font-weight: 500;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
+    letter-spacing: 0.02em;
     line-height: 1;
-  }
-
-  .chip-dot {
-    width: 5px;
-    height: 5px;
-    border-radius: 999px;
-    background: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(196, 88, 74, 0.16), 0 0 10px rgba(196, 88, 74, 0.65);
   }
 
   /* ============================================================
@@ -675,28 +666,6 @@ pre code .tok-function {
   .heading-1 {
     font-size: clamp(2.15rem, 4.6vw, 3.35rem);
     letter-spacing: -0.035em;
-  }
-
-  /* Eyebrow label */
-  .eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin: 0;
-    color: var(--color-primary);
-    font-size: 11px;
-    font-weight: 600;
-    line-height: 1;
-    letter-spacing: 0.24em;
-    text-transform: uppercase;
-  }
-
-  .eyebrow::before {
-    content: "";
-    width: 22px;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--color-primary));
-    box-shadow: 0 0 8px rgba(196, 88, 74, 0.55);
   }
 }
 

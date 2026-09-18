@@ -22,7 +22,6 @@ export default function NotFound() {
   return (
     <Container>
       <Section className="flex flex-col items-start gap-5 py-20 md:py-28">
-        <p className="eyebrow fade-up">404</p>
         <Heading className="fade-up text-4xl font-semibold tracking-tight sm:text-5xl">
           Page not found
         </Heading>

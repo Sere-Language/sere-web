@@ -6,12 +6,15 @@
  * actually uses it, and every failure is reported in terms of what has to be
  * fixed rather than as a bare status code.
  *
- * Nothing here is secret: no key material is read, and the database messages it
- * can return are schema names and provider errors. Rate limited all the same.
+ * This report is for the operator, not the public: it discusses environment
+ * variables and project identifiers. Callers prove who they are with a publish
+ * credential — the shared CI token in `x-publish-token`, or any developer token
+ * in `Authorization`. No key material is ever read or echoed back.
  */
 
+import { verifyPublishToken } from "@/app/lib/apiTokens.server";
 import { RATE_LIMITS, checkIpRateLimit, rateLimitedResponse } from "@/app/lib/rateLimit.server";
-import { jsonResponse } from "@/app/lib/security.server";
+import { constantTimeEqual, jsonResponse } from "@/app/lib/security.server";
 import {
     PACKAGES_BUCKET,
     describeRegistryError,
@@ -56,6 +59,34 @@ async function check(
 
 function skipped(name: string, why: string): Check {
   return { name, ok: false, detail: why };
+}
+
+/** A shared secret shorter than this is not accepted as the CI token. */
+const MIN_SHARED_TOKEN_LENGTH = 24;
+
+/**
+ * Operators only. Either the deployment's shared CI token, or a real developer
+ * publish token, is accepted — the report describes the deployment, so it is
+ * worth no less than the ability to publish to it.
+ */
+async function authorize(request: NextRequest): Promise<boolean> {
+    const presented = (request.headers.get("x-publish-token") ?? "").trim();
+    const shared = envValue("PACKAGE_PUBLISH_TOKEN") ?? "";
+
+    if (
+        presented &&
+        shared.length >= MIN_SHARED_TOKEN_LENGTH &&
+        constantTimeEqual(presented, shared)
+    ) {
+        return true;
+    }
+
+    const header = request.headers.get("authorization") ?? "";
+    const bearer = header.toLowerCase().startsWith("bearer ") ? header.slice(7).trim() : "";
+    if (!bearer) return false;
+
+    const verified = await verifyPublishToken(bearer);
+    return verified.ok && verified.scope === "publish";
 }
 
 function safeHost(url: string): string | null {
@@ -122,6 +153,16 @@ export async function GET(request: NextRequest): Promise<Response> {
   if (!limit.allowed) {
     return rateLimitedResponse(limit, "Too many status checks. Wait a few minutes.");
   }
+
+    if (!(await authorize(request))) {
+        return jsonResponse(
+            {
+                error:
+                    "This report is for deployment operators. Send a publish token as `Authorization: Bearer <token>` or `x-publish-token`.",
+            },
+            401,
+        );
+    }
 
   const config = registryStatus();
   const anon = getSupabaseServerClient();

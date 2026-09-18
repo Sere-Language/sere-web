@@ -16,7 +16,6 @@ export default function AuthCallbackPage() {
     <Container>
       <Section className="py-14 md:py-18">
         <Stack gap="sm" className="max-w-lg">
-          <p className="eyebrow w-fit">Developers</p>
           <Heading className="text-3xl font-semibold tracking-tight">
             Confirming your account
           </Heading>

@@ -7,14 +7,12 @@ import Text from "./Text";
 interface PageIntroProps {
   title: string;
   description: string;
-  eyebrow?: string;
   children: React.ReactNode;
 }
 
 export default function PageIntro({
   title,
   description,
-  eyebrow = "Sere",
   children,
 }: PageIntroProps) {
   return (
@@ -28,7 +26,6 @@ export default function PageIntro({
       <Section className="py-14 md:py-18">
         <Stack gap="lg">
           <Stack gap="sm">
-            <p className="eyebrow fade-up w-fit">{eyebrow}</p>
             <Heading className="fade-up text-4xl font-semibold tracking-tight sm:text-5xl">
               {title}
             </Heading>

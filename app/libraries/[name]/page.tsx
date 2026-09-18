@@ -97,7 +97,6 @@ export default async function LibraryPage({ params }: LibraryPageProps) {
       />
 
       <PageIntro
-        eyebrow="Package"
         title={pkg.displayName}
         description={pkg.summary || `The ${pkg.name} package for Sere.`}
       >

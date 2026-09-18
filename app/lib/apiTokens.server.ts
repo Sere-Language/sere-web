@@ -178,15 +178,15 @@ export function describeTokenFailure(failure: {
     case "not-configured":
       return {
         status: 503,
-        error:
-          "This deployment cannot check tokens yet: it has no SUPABASE_SERVICE_ROLE_KEY. The site operator needs to add it and redeploy.",
+        error: "The registry cannot check tokens right now. Try again shortly.",
       };
     case "store-unavailable":
+      // The underlying provider detail names environment variables and schema
+      // files, and this response is served to anyone who presents a token. It
+      // is logged server-side instead; operators read /api/registry/status.
       return {
         status: 503,
-        error: failure.detail
-          ? `The registry could not check that token: ${failure.detail}.`
-          : "The registry could not check that token right now. Try again shortly.",
+        error: "The registry could not check that token right now. Try again shortly.",
       };
     case "revoked":
       return {

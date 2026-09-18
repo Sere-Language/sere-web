@@ -621,13 +621,16 @@ export async function createDeveloperToken(
   const record = mapToken(data);
   if (error || !record) {
     // A missing table, a wrong key or an unreachable database all used to read
-    // as a transient failure, which invited pointless retries.
-    const hint = describeRegistryError(error).summary;
+    // as a transient failure, which invited pointless retries. The specific
+    // cause names variables and schema files, so it is logged for the operator
+    // and the developer gets a sentence they can act on.
+    console.error(
+      "[registry] token insert failed:",
+      describeRegistryError(error).summary ?? error,
+    );
     return {
       ok: false,
-      error: hint
-        ? `Could not create that token: ${hint}.`
-        : "Could not create that token. Try again.",
+      error: "Could not create that token. Try again in a moment.",
     };
   }
 

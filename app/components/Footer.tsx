@@ -15,12 +15,6 @@ export default function Footer() {
           <BrandMark alt="" size={28} className="transition-transform duration-300 group-hover:scale-105" />
           <span className="font-medium tracking-tight">Sere</span>
         </Link>
-        <a href="https://smollaunch.com" target="_blank" rel="noopener">
-  <img src="https://smollaunch.com/badges/featured-dark.svg" alt="Sere — Featured on Smol Launch" loading="lazy" width="250" height="60" />
-</a>
-<a href="https://www.launchit.site/launches/sere-language" target="_blank" rel="noopener">
-  <img src="https://www.launchit.site/badges/launchit-dark.svg" alt="Sere Language - Featured on Launchit" width="200" height="54" />
-</a>
 
         <nav className="flex items-center gap-1 text-xs text-muted">
           <Link href="https://github.com/Sere-Language/sere" className="rounded-md px-2.5 py-1.5 text-muted no-underline transition-colors hover:bg-white/[0.04] hover:text-foreground hover:no-underline">

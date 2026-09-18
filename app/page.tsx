@@ -14,11 +14,11 @@ import Stack from "./components/Stack";
 import Text from "./components/Text";
 import { getReleaseCatalog, recommendedRelease } from "./lib/release";
 import {
-  SITE_DESCRIPTION,
-  SITE_TITLE,
-  faqJsonLd,
-  pageMetadata,
-  softwareApplicationJsonLd,
+    SITE_DESCRIPTION,
+    SITE_TITLE,
+    faqJsonLd,
+    pageMetadata,
+    softwareApplicationJsonLd,
 } from "./lib/seo";
 import { CODE_SAMPLE } from "./utils/code";
 import { highlightSere } from "./utils/highlight";
@@ -160,11 +160,6 @@ export default async function Home() {
 
         <div className="relative grid items-center gap-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-16">
           <div className="flex flex-col items-start gap-7">
-            <p className="chip fade-up">
-              <span className="chip-dot" />
-              Compiled language · Native toolchain
-            </p>
-
             <div className="flex items-center gap-5 md:gap-7">
               <div className="relative shrink-0">
                 <div className="absolute -inset-5 rounded-full bg-primary/20 blur-2xl" />
@@ -215,7 +210,7 @@ export default async function Home() {
                   key={label}
                   className="flex flex-col gap-1 bg-surface-raised/85 px-3.5 py-3"
                 >
-                  <dt className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted/70">
+                  <dt className="font-mono text-[11px] tracking-normal text-muted/70">
                     {label}
                   </dt>
                   <dd className="m-0 text-[13px] font-medium text-foreground/90">
@@ -243,7 +238,6 @@ export default async function Home() {
         <Stack gap="lg">
           <Reveal>
             <div className="flex flex-col gap-4">
-              <p className="eyebrow">Standalone by design</p>
               <Heading level={2} className="section-title">
                 Completely standalone.
               </Heading>
@@ -274,7 +268,6 @@ export default async function Home() {
         <Stack gap="lg">
           <Reveal>
             <div className="flex flex-col gap-4">
-              <p className="eyebrow">Language surface</p>
               <Heading level={2} className="section-title">
                 The pieces that matter
               </Heading>
@@ -314,7 +307,6 @@ export default async function Home() {
         <Stack gap="lg">
           <Reveal>
             <div className="flex flex-col gap-4">
-              <p className="eyebrow">Questions</p>
               <Heading level={2} className="section-title">
                 Frequently asked
               </Heading>

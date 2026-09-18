@@ -34,30 +34,29 @@ import { manifestFromFormData } from "@/app/lib/packageManifest";
 import { MAX_PACKAGE_BYTES, publishPackage } from "@/app/lib/packagePublish.server";
 import { listPackages } from "@/app/lib/packageRegistry.server";
 import {
-    DEFAULT_PACKAGE_SORT,
-    PACKAGE_SORTS,
-    packageApiPath,
-    packageInstallCommand,
-    type PackageSort,
+  DEFAULT_PACKAGE_SORT,
+  PACKAGE_SORTS,
+  packageApiPath,
+  packageInstallCommand,
+  type PackageSort,
 } from "@/app/lib/packages";
 import {
-    RATE_LIMITS,
-    checkIpRateLimit,
-    checkRateLimit,
-    rateLimitHeaders,
-    rateLimitedResponse,
+  RATE_LIMITS,
+  checkIpRateLimit,
+  checkRateLimit,
+  rateLimitHeaders,
+  rateLimitedResponse,
 } from "@/app/lib/rateLimit.server";
 import {
-    clientIp,
-    constantTimeEqual,
-    hashIp,
-    jsonResponse,
+  clientIp,
+  constantTimeEqual,
+  hashIp,
+  jsonResponse,
 } from "@/app/lib/security.server";
 import {
-    envValue,
-    getSupabaseAdminClient,
-    isSupabaseConfigured,
-    registryStatus,
+  envValue,
+  getSupabaseAdminClient,
+  isSupabaseConfigured,
 } from "@/app/lib/supabase/server";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { NextRequest } from "next/server";
@@ -93,8 +92,7 @@ async function resolvePublisher(request: NextRequest): Promise<PublishAuth> {
       response: jsonResponse(
         {
           error:
-            registryStatus().publishProblem ??
-            "Publishing is not available on this deployment.",
+            "Publishing is unavailable on this deployment right now. Try again shortly.",
         },
         503,
       ),
@@ -178,9 +176,6 @@ export async function GET(request: NextRequest): Promise<Response> {
       count: packages.length,
       sort,
       registryConfigured: isSupabaseConfigured(),
-      // Lets a caller see what this deployment can actually do before trying to
-      // publish, without any key material appearing in a response.
-      status: registryStatus(),
       packages: packages.map((pkg) => ({
         ...pkg,
         url: packageApiPath(pkg.name),

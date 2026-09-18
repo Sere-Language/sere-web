@@ -54,14 +54,22 @@ export async function POST(request: NextRequest): Promise<Response> {
   }
 
   const env = supabaseEnv();
+    const status = registryStatus();
 
   return jsonResponse({
     valid: true,
     scope: verified.scope,
     tokenId: verified.tokenId,
     developerId: verified.developerId,
-    // The URL is public — it ships in every page — and comparing the host is the
-    // fastest way to spot a token that was created against a different project.
-    deployment: { ...registryStatus(), supabaseHost: env ? safeHost(env.url) : null },
+      // Capability flags only. `publishDiagnosis` is deliberately left out: this
+      // route answers anyone holding a token, and the diagnosis names variables.
+      deployment: {
+          supabase: status.supabase,
+          serviceRole: status.serviceRole,
+          sharedPublishToken: status.sharedPublishToken,
+          // The URL is public — it ships in every page — and comparing the host is
+          // the fastest way to spot a token made against a different project.
+          supabaseHost: env ? safeHost(env.url) : null,
+      },
   });
 }

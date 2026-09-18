@@ -167,7 +167,6 @@ export default async function IssuesPage() {
 
   return (
     <PageIntro
-      eyebrow="GitHub"
       title="Issues"
       description="Track bugs, feature requests, and language discussions from the Sere repository. Filter by status or search by label."
     >
