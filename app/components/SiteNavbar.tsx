@@ -1,6 +1,7 @@
 import Navbar from "./Navbar";
 import NavbarButton from "./NavbarButton";
-export default function SiteNavbar() {
+
+export default function SiteNavbar() {
   return (
     <Navbar>
       <NavbarButton href="/install">Install</NavbarButton>
@@ -9,6 +10,7 @@ import NavbarButton from "./NavbarButton";
       <NavbarButton href="/issues">Issues</NavbarButton>
       <NavbarButton href="/community">Community</NavbarButton>
       <NavbarButton href="/contribution">Contribution</NavbarButton>
+      <NavbarButton href="/developers">Developers</NavbarButton>
     </Navbar>
   );
 }

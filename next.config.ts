@@ -1,41 +1,33 @@
 import type { NextConfig } from "next";
 
-const nodeFsStub = "./app/lib/nodeFsStub.ts";
+/**
+ * Defence in depth for anything that finds its way into rendered markup.
+ * `unsafe-inline` is required by Next's hydration bootstrap; every other source
+ * is locked to this origin.
+ */
+const CONTENT_SECURITY_POLICY_HEADER = {
+  key: "Content-Security-Policy",
+  value: [
+    "default-src 'self'",
+    "base-uri 'self'",
+    "object-src 'none'",
+    "frame-src 'none'",
+    "frame-ancestors 'none'",
+    "form-action 'self'",
+    "script-src 'self' 'unsafe-inline'",
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: blob: https:",
+    "font-src 'self' data:",
+    "connect-src 'self'",
+    "worker-src 'self' blob:",
+    "manifest-src 'self'",
+    "upgrade-insecure-requests",
+  ].join("; "),
+};
 
 const nextConfig: NextConfig = {
   // Don't advertise the framework on every response.
   poweredByHeader: false,
-  transpilePackages: ["@userland-run/nano-sdk"],
-  turbopack: {
-    resolveAlias: {
-      "fs/promises": { browser: nodeFsStub },
-      "node:fs/promises": { browser: nodeFsStub },
-      fs: { browser: nodeFsStub },
-      "node:fs": { browser: nodeFsStub },
-    },
-  },
-  webpack: (config, { isServer }) => {
-    if (!isServer) {
-      config.resolve.alias = {
-        ...config.resolve.alias,
-        "fs/promises": false,
-        "node:fs/promises": false,
-        fs: false,
-        "node:fs": false,
-      };
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        fs: false,
-        "fs/promises": false,
-        path: false,
-        module: false,
-        os: false,
-        child_process: false,
-        worker_threads: false,
-      };
-    }
-    return config;
-  },
   redirects: async () => [
     {
       // Consolidate the www host onto the canonical apex domain.
@@ -52,23 +44,24 @@ const nextConfig: NextConfig = {
       headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
     },
     {
-      source: "/cloud/projects/:path*",
-      headers: [
-        { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
-        { key: "Cross-Origin-Embedder-Policy", value: "credentialless" },
-      ],
-    },
-    {
-      source: "/nano/:path*",
-      headers: [
-        { key: "Cross-Origin-Resource-Policy", value: "cross-origin" },
-      ],
-    },
-    {
       source: "/(.*)",
       headers: [
         { key: "X-Content-Type-Options", value: "nosniff" },
         { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+        { key: "X-Frame-Options", value: "DENY" },
+        { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+        {
+          key: "Permissions-Policy",
+          value: "camera=(), microphone=(), geolocation=(), payment=()",
+        },
+        {
+          key: "Strict-Transport-Security",
+          value: "max-age=63072000; includeSubDomains; preload",
+        },
+        // Production only: the dev server relies on eval-based hot reloading.
+        ...(process.env.NODE_ENV === "production"
+          ? [CONTENT_SECURITY_POLICY_HEADER]
+          : []),
       ],
     },
   ],

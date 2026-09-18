@@ -1,13 +1,7 @@
 import type { MetadataRoute } from "next";
 import { absoluteUrl, SITE_URL } from "./lib/seo";
 
-const DISALLOW = [
-  "/api/",
-  "/design-review",
-  "/cloud/dashboard",
-  "/cloud/projects",
-  "/cloud/auth/",
-];
+const DISALLOW = ["/api/", "/developers/", "/auth/"];
 
 // Crawlers we explicitly welcome — these feed AI answer engines and developer
 // assistants, which is where a language's docs get discovered today.

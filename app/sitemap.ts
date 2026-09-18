@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
 import { listDocs } from "./lib/docs";
+import { listPackageNames } from "./lib/packageRegistry.server";
+import { PACKAGE_MAX_LIMIT, packagePath } from "./lib/packages";
 import { absoluteUrl } from "./lib/seo";
 
 // Regenerate hourly. Doc pages are synced from the Sere repository, so a short
@@ -50,5 +52,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Sitemap still ships the static routes if the docs source is unavailable.
   }
 
-  return [...staticEntries, ...docEntries];
+  let packageEntries: MetadataRoute.Sitemap = [];
+  try {
+    const names = await listPackageNames(PACKAGE_MAX_LIMIT);
+    packageEntries = names.map((name) => ({
+      url: absoluteUrl(packagePath(name)),
+      lastModified: now,
+      changeFrequency: "weekly" as const,
+      priority: 0.6,
+    }));
+  } catch {
+    // A registry that cannot be reached simply contributes no entries.
+  }
+
+  return [...staticEntries, ...docEntries, ...packageEntries];
 }

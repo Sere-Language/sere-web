@@ -565,7 +565,7 @@ pre code .tok-function {
 }
 
 /* Inputs — milled-in wells */
-:where(input, textarea, select):not(.monaco-editor *, .xterm *) {
+:where(input, textarea, select) {
   background-color: var(--color-surface-well);
   background-image: var(--texture-noise);
   color: var(--color-foreground);
@@ -591,7 +591,45 @@ pre code .tok-function {
   color: var(--color-muted);
 }
 
-:where(a, button, input, textarea, select, summary, [tabindex]):focus-visible:not(.monaco-editor *, .xterm *) {
+/* Bare field — for search that belongs to the page rather than to a box.
+   Sits directly on the background; the caret and the underline carry focus. */
+.field-bare {
+  background-color: transparent;
+  background-image: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+.field-bare:hover,
+.field-bare:focus,
+.field-bare:focus-visible {
+  background-color: transparent;
+  border: 0;
+  box-shadow: none;
+  outline: none;
+}
+
+/* Inline text control — ruled button used for sorting and clearing */
+.text-tab {
+  border-bottom: 1px solid transparent;
+  padding-bottom: 2px;
+  line-height: 1;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.text-tab:hover {
+  border-bottom-color: var(--color-border-strong);
+  color: var(--color-foreground);
+}
+
+.text-tab[aria-pressed="true"] {
+  border-bottom-color: var(--color-primary);
+  color: var(--color-foreground);
+}
+
+:where(a, button, input, textarea, select, summary, [tabindex]):focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
   border-radius: 4px;
@@ -705,28 +743,6 @@ pre code .tok-function {
   font-family: var(--font-geist-mono), ui-monospace, monospace;
   font-size: 10px;
   letter-spacing: 0.08em;
-}
-
-.cloud-shot {
-  overflow: hidden;
-}
-
-.cloud-shot-frame {
-  overflow: hidden;
-  border: 1px solid var(--color-border);
-  border-top-color: var(--color-border-strong);
-  border-radius: var(--radius-xl);
-  background-color: var(--color-surface);
-  background-image: var(--texture-noise);
-  box-shadow: var(--shadow-xl), var(--bevel-top-strong), var(--bevel-bottom);
-}
-
-.cloud-shot-caption {
-  display: flex;
-  gap: 0.55rem;
-  margin-top: 0.75rem;
-  color: var(--color-muted);
-  font-size: 12px;
 }
 
 /* Docs prose */
@@ -871,81 +887,6 @@ pre code .tok-function {
   .doc-prose h2:target, .doc-prose h3:target {
     scroll-margin-top: 8rem;
   }
-}
-
-/* Workbench styles */
-.workbench-shell {
-  background: var(--color-background);
-}
-
-.workbench-dock .dv-dockview {
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-sm);
-}
-
-.workbench-dock .dockview-theme-abyss {
-  background: transparent !important;
-  padding: 0 !important;
-  --dv-spacing-padding: 0px;
-  --dv-border-radius: 0px;
-  --dv-tab-border-radius: 5px;
-  --dv-tab-margin: 0;
-  --dv-tabs-and-actions-container-height: 36px;
-  --dv-tabs-and-actions-container-font-size: 12px;
-  --dv-color-abyss-dark: transparent;
-  --dv-color-abyss: transparent;
-  --dv-color-abyss-light: rgba(255, 255, 255, 0.03);
-  --dv-color-abyss-lighter: rgba(255, 255, 255, 0.06);
-  --dv-color-abyss-accent: var(--color-primary);
-  --dv-group-view-background-color: transparent;
-  --dv-tabs-and-actions-container-background-color: var(--color-card);
-  --dv-activegroup-visiblepanel-tab-background-color: #2a2e32;
-  --dv-activegroup-hiddenpanel-tab-background-color: transparent;
-  --dv-inactivegroup-visiblepanel-tab-background-color: #1a1d21;
-  --dv-inactivegroup-hiddenpanel-tab-background-color: transparent;
-  --dv-tab-divider-color: transparent;
-  --dv-activegroup-visiblepanel-tab-color: var(--color-foreground);
-  --dv-activegroup-hiddenpanel-tab-color: #9a948f;
-  --dv-inactivegroup-visiblepanel-tab-color: #c8c2be;
-  --dv-inactivegroup-hiddenpanel-tab-color: var(--color-muted);
-  --dv-separator-border: rgba(255, 255, 255, 0.06);
-  --dv-paneview-active-outline-color: rgba(196, 88, 74, 0.4);
-  --dv-active-sash-color: rgba(196, 88, 74, 0.6);
-  --dv-drag-over-background-color: rgba(196, 88, 74, 0.12);
-}
-
-.workbench-dock .dv-groupview {
-  overflow: hidden;
-  border: none !important;
-  border-radius: 0 !important;
-  background: var(--color-card) !important;
-  box-shadow: none;
-}
-
-.workbench-dock .dv-tabs-and-actions-container {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  padding: 0 4px;
-}
-
-.workbench-dock .dv-tab {
-  margin: 3px 1px;
-  padding-inline: 10px;
-  border-radius: 5px !important;
-}
-
-.workbench-dock .dv-content-container,
-.workbench-dock .dv-view,
-.workbench-dock .dv-react-part > div {
-  background: transparent;
-}
-
-.workbench-dock .dv-sash-container .dv-sash {
-  background: rgba(255, 255, 255, 0.06);
 }
 
 #main-content {

@@ -1,17 +1,7 @@
-"use client";
-
-import { isProjectEditorPath } from "@/app/lib/routes";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import BrandMark from "./BrandMark";
 
 export default function Footer() {
-  const pathname = usePathname();
-
-  if (isProjectEditorPath(pathname)) {
-    return null;
-  }
-
   return (
     <footer className="relative mt-20 border-t border-border-muted">
 
