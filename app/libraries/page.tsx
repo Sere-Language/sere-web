@@ -9,7 +9,7 @@ import PageIntro from "../components/PageIntro";
 import Reveal from "../components/Reveal";
 import Stack from "../components/Stack";
 import Text from "../components/Text";
-import { isRegistryConfigured, listPackages } from "../lib/packageRegistry.server";
+import { listPackages } from "../lib/packageRegistry.server";
 import { PACKAGE_MAX_LIMIT } from "../lib/packages";
 import { pageMetadata } from "../lib/seo";
 import { highlightSere } from "../utils/highlight";
@@ -29,8 +29,8 @@ export const metadata: Metadata = pageMetadata({
   ],
 });
 
-// Published packages change over time; refresh on the same cadence as the docs.
-export const revalidate = 300;
+// The registry changes on every publish, so the list is read fresh per request.
+export const dynamic = "force-dynamic";
 
 const MODULES = [
   { name: "prelude", body: "Always injected: print, abs, min, max, Int / Float, dbg!." },
@@ -56,35 +56,28 @@ license = "MIT"
 repository = "https://github.com/you/hello-utils"
 keywords = ["utilities", "strings"]`;
 
-const PUBLISH_SAMPLE = `sere pack hello-utils
-
-curl -X POST https://sere-lang.com/api/packages \\
-  -H "Authorization: Bearer $SERE_TOKEN" \\
-  -F "name=hello-utils" \\
-  -F "version=0.1.0" \\
-  -F "manifest=@sere.toml" \\
-  -F "readme=@README.md" \\
-  -F tarball=@dist/hello-utils-0.1.0.tar.gz`;
+const PUBLISH_SAMPLE = `cd hello-utils          # the folder holding sere.toml
+sere login $SERE_TOKEN  # once per project
+sere publish`;
 
 export default async function LibrariesPage() {
   const packages = await listPackages({ limit: PACKAGE_MAX_LIMIT });
-  const registryConfigured = isRegistryConfigured();
 
   return (
     <PageIntro
       title="Libraries"
       description="Search every package published to the Sere registry. Install one with sere add, or push your own with the publish API. The standard library still ships with the compiler — everything in the list above is a package you opt into."
     >
-      <PackageExplorer packages={packages} registryConfigured={registryConfigured} />
+      <PackageExplorer packages={packages} />
 
       <Stack gap="lg">
         <Stack gap="sm">
           <Heading level={2}>Publish a package</Heading>
           <Text muted className="max-w-2xl">
-            Describe the package in <code>sere.toml</code>, pack it, then POST the
-            archive to the registry. Versions are immutable: uploading the same
-            version twice is rejected, so a tag in a manifest always resolves to
-            the same bytes.
+            Describe the package in <code>sere.toml</code>, sign the CLI in once
+            with a token, then publish from the library folder. Versions are
+            immutable: uploading the same version twice is rejected, so a tag in a
+            manifest always resolves to the same bytes.
           </Text>
           <Button href="/developers" className="mt-1">
             Open your developer account

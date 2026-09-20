@@ -11,8 +11,7 @@ import Reveal from "../components/Reveal";
 import Stack from "../components/Stack";
 import Text from "../components/Text";
 import { listDeveloperTokens, requireDeveloper } from "../lib/developers.server";
-import { SITE_URL, pageMetadata } from "../lib/seo";
-import { registryStatus } from "../lib/supabase/server";
+import { pageMetadata } from "../lib/seo";
 
 export const metadata: Metadata = pageMetadata({
   title: "Developer accounts",
@@ -25,41 +24,12 @@ export const metadata: Metadata = pageMetadata({
 // Sessions live in cookies, so this page is rendered per request.
 export const dynamic = "force-dynamic";
 
-const PUBLISH_SHAPE = `curl -X POST ${SITE_URL}/api/packages \\
-  -H "Authorization: Bearer $SERE_TOKEN" \\
-  -F "name=hello-utils" \\
-  -F "version=0.1.0" \\
-  -F "summary=Small helpers for Sere projects." \\
-  -F "manifest=@sere.toml" \\
-  -F "readme=@README.md" \\
-  -F tarball=@dist/hello-utils-0.1.0.tar.gz`;
+const PUBLISH_SHAPE = `cd hello-utils          # the folder holding sere.toml
+sere login $SERE_TOKEN  # once per project
+sere publish`;
 
 export default async function DevelopersPage() {
-  const status = registryStatus();
-  const session = status.supabase ? await requireDeveloper() : null;
-
-  if (!status.supabase) {
-    return (
-      <PageIntro
-        title="Developer accounts"
-        description="Accounts are not open on this deployment yet."
-      >
-        <Card variant="panel">
-          <Stack gap="sm">
-            <Heading level={3}>Not open yet</Heading>
-            <Text muted className="text-sm leading-6">
-              Publishing accounts and the package registry are part of this site,
-              and they are not switched on here yet. There is nothing to install
-              or configure on your side — check back shortly.
-            </Text>
-            <Button href="/libraries" variant="secondary" className="mt-1">
-              Browse packages
-            </Button>
-          </Stack>
-        </Card>
-      </PageIntro>
-    );
-  }
+  const session = await requireDeveloper();
 
   if (!session) {
     return (
@@ -157,29 +127,17 @@ export default async function DevelopersPage() {
         </Button>
       </div>
 
-      {status.publishProblem ? (
-        <Card variant="panel">
-          <Stack gap="sm">
-            <Heading level={3}>Publishing is paused</Heading>
-            <Text muted className="text-sm leading-6">
-              The registry is not accepting uploads at the moment. You can still
-              create a token below — publishes will return <code>503</code> until
-              it is back.
-            </Text>
-          </Stack>
-        </Card>
-      ) : null}
-
-      <TokenManager initialTokens={tokens} publishUrl={`${SITE_URL}/api/packages`} />
+      <TokenManager initialTokens={tokens} />
 
       <Stack gap="lg">
         <Stack gap="sm">
           <Heading level={2}>Publishing</Heading>
           <Text muted className="max-w-2xl text-sm leading-6">
-            Pack the library, describe it in <code>sere.toml</code>, then POST the
-            archive with a token. The registry validates the name and version,
-            stores the payload, records the checksum, and points the package at the
-            highest version published so far.
+            Describe the package in <code>sere.toml</code>, sign the CLI in once
+            with a token, then publish from the library folder. The registry
+            validates the name and version, stores the payload, records the
+            checksum, and points the package at the highest version published so
+            far.
           </Text>
           <Button href="/docs/publishing" variant="secondary" className="mt-1">
             Read the publishing guide
@@ -199,7 +157,7 @@ keywords = ["utilities", "strings"]`}
           </Reveal>
           <Reveal delay={80}>
             <CodeBlock filename="publish" wide>
-              {PUBLISH_SHAPE.replace("///api/packages", "/api/packages")}
+              {PUBLISH_SHAPE}
             </CodeBlock>
           </Reveal>
         </Grid>

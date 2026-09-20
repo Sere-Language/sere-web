@@ -19,8 +19,6 @@ export interface TokenRecord {
 
 interface TokenManagerProps {
   initialTokens: TokenRecord[];
-  /** Absolute URL of the publish endpoint, for the copy-paste example. */
-  publishUrl: string;
 }
 
 const EXPIRY_OPTIONS = [
@@ -43,16 +41,16 @@ function isExpired(iso: string | null): boolean {
   return Number.isFinite(time) && time <= Date.now();
 }
 
-export default function TokenManager({ initialTokens, publishUrl }: TokenManagerProps) {
+export default function TokenManager({ initialTokens }: TokenManagerProps) {
   const [tokens, setTokens] = useState<TokenRecord[]>(initialTokens);
   const [label, setLabel] = useState("publish");
   const [expiryDays, setExpiryDays] = useState("");
   const [freshToken, setFreshToken] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [copied, setCopied] = useState<"token" | "curl" | null>(null);
+  const [copied, setCopied] = useState<"token" | "publish" | null>(null);
 
-  const copy = async (value: string, which: "token" | "curl") => {
+  const copy = async (value: string, which: "token" | "publish") => {
     try {
       await navigator.clipboard.writeText(value);
       setCopied(which);
@@ -120,12 +118,10 @@ export default function TokenManager({ initialTokens, publishUrl }: TokenManager
     }
   };
 
-  const curlExample = freshToken
-    ? `curl -X POST ${publishUrl} \\
-  -H "Authorization: Bearer ${freshToken}" \\
-  -F "name=hello-utils" \\
-  -F "version=0.1.0" \\
-  -F tarball=@dist/hello-utils-0.1.0.tar.gz`
+  const publishExample = freshToken
+    ? `# in your sere lib project
+sere login ${freshToken}
+sere publish`
     : "";
 
   return (
@@ -134,8 +130,9 @@ export default function TokenManager({ initialTokens, publishUrl }: TokenManager
         <Heading level={2}>Publish tokens</Heading>
         <Text muted className="max-w-2xl text-sm leading-6">
           A token is a password for your tooling. It is shown once, stored only as
-          a hash, and can be revoked at any time. Send it as{" "}
-          <code>Authorization: Bearer &lt;token&gt;</code> when you publish.
+          a hash, and can be revoked at any time. Sign the CLI in from your library
+          project with <code>sere login &lt;token&gt;</code>, then publish with{" "}
+          <code>sere publish</code>.
         </Text>
       </Stack>
 
@@ -203,14 +200,14 @@ export default function TokenManager({ initialTokens, publishUrl }: TokenManager
             </div>
             <div className="flex items-start gap-3">
               <pre className="m-0 min-w-0 flex-1 overflow-x-auto text-xs leading-6">
-                <code>{curlExample}</code>
+                <code>{publishExample}</code>
               </pre>
               <button
                 type="button"
-                onClick={() => copy(curlExample, "curl")}
+                onClick={() => copy(publishExample, "publish")}
                 className="shrink-0 rounded-md border border-border px-2.5 py-1 text-[11px] font-medium tracking-[0.12em] text-muted uppercase transition-colors hover:border-border-strong hover:text-foreground"
               >
-                {copied === "curl" ? "Copied" : "Copy"}
+                {copied === "publish" ? "Copied" : "Copy"}
               </button>
             </div>
           </div>

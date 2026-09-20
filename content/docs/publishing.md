@@ -1,6 +1,6 @@
 # Publishing a package
 
-Create an account, mint a publish token, then push a versioned package to the Sere registry with one HTTP request.
+Create an account, mint a publish token, then push a versioned package to the Sere registry from your library project with `sere login` and `sere publish`.
 
 The registry is part of this site. You do not need a database account, a third-party login, or a key copied out of a console — you sign up here, create a token, and start uploading.
 
@@ -58,7 +58,16 @@ sere_4f0c9a21_9tK3xQpR7vLm2YbW8sN6dH1jC5zA0eU4rT7iG3oP
 
 **The full token is shown exactly once.** The server keeps only a SHA-256 hash and the public prefix, so nobody — including an operator reading the database — can recover it. If you lose it, revoke that token and create another.
 
-Store it as an environment variable rather than pasting it into a file you might commit:
+Hand the token to the CLI from inside your library project:
+
+```bash
+cd hello-utils
+sere login sere_4f0c9a21_9tK3xQpR7vLm2YbW8sN6dH1jC5zA0eU4rT7iG3oP
+```
+
+`sere login` stores the token and checks it against the registry immediately, so a value that is wrong, revoked or expired is refused there rather than halfway through an upload.
+
+In CI, read the token from a secret rather than pasting it into a file you might commit:
 
 ```bash
 export SERE_TOKEN="sere_4f0c9a21_9tK3xQpR7vLm2YbW8sN6dH1jC5zA0eU4rT7iG3oP"
@@ -102,30 +111,15 @@ Add a `README.md` next to the manifest. It is rendered on your package page unde
 
 ## 4. Publish
 
-Pack the library:
+Publishing happens from inside the library project — the folder that holds `sere.toml`. Sign the CLI in with your token, then publish:
 
 ```bash
-sere pack hello-utils
+cd hello-utils
+sere login sere_4f0c9a21_9tK3xQpR7vLm2YbW8sN6dH1jC5zA0eU4rT7iG3oP
+sere publish
 ```
 
-Upload it. The archive can be the `.slib` that `sere pack` produces, or a `.tar.gz` / `.zip` of the library folder:
-
-```bash
-curl -X POST https://sere-lang.com/api/packages \
-  -H "Authorization: Bearer $SERE_TOKEN" \
-  -F "name=hello-utils" \
-  -F "version=0.1.0" \
-  -F "manifest=@sere.toml" \
-  -F "readme=@README.md" \
-  -F tarball=@dist/hello-utils-0.1.0.tar.gz
-```
-
-Every field except the archive is optional if you send `manifest`, and any field you do send overrides the manifest — handy when CI stamps the version:
-
-```bash
-  -F "manifest=@sere.toml" \
-  -F "version=$RELEASE_VERSION" \
-```
+`sere publish` reads `sere.toml`, packs the library — the entry file plus the local modules it imports, or a `.tar.gz` / `.zip` of the library folder — and uploads the version the manifest names, with `README.md` alongside it. What you described in step 3 is what the registry stores, so a change ships by bumping `version` in `sere.toml` and publishing again.
 
 A successful publish answers `201`:
 
@@ -189,7 +183,7 @@ tar -xzf hello-utils-0.1.0.tar.gz -C libs/hello-utils
 
 ## 6. Publish from CI
 
-A token plus one `curl` is the whole integration. Guard the token with a secret, and publish on tag pushes:
+A token plus two CLI calls is the whole integration. Guard the token with a secret, and publish on tag pushes:
 
 ```yaml
 name: publish
@@ -203,22 +197,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Pack
-        run: sere pack hello-utils
-
-      - name: Publish to the Sere registry
+      - name: Sign the CLI in
         env:
           SERE_TOKEN: ${{ secrets.SERE_TOKEN }}
-        run: |
-          curl --fail-with-body -X POST https://sere-lang.com/api/packages \
-            -H "Authorization: Bearer $SERE_TOKEN" \
-            -F "manifest=@sere.toml" \
-            -F "version=${GITHUB_REF_NAME#v}" \
-            -F "readme=@README.md" \
-            -F tarball=@dist/hello-utils-0.1.0.tar.gz
+        run: sere login "$SERE_TOKEN"
+
+      - name: Publish to the Sere registry
+        run: sere publish
 ```
 
-Use `--fail-with-body` so a rejected publish fails the job and prints the reason.
+Both commands exit non-zero when the registry refuses them, so a rejected publish fails the job and prints the reason. If the version should come from the tag rather than from the manifest, write it into `sere.toml` before publishing.
 
 ## 7. What the API checks
 
@@ -229,7 +217,7 @@ Use `--fail-with-body` so a rejected publish fails the job and prints the reason
 | `403` | Either the token cannot publish, or the package name belongs to someone else. | Use a `publish`-scoped token; if the name is taken, publish under a different one. |
 | `409` | That version already exists. | Bump the version. |
 | `413` | The archive is over 25 MB, or the README is over 64 KB. | Trim the payload — the registry is for libraries, not build output. |
-| `415` | The request was not `multipart/form-data`. | Send the fields shown above; `-F` does this for you. |
+| `415` | The request was not `multipart/form-data`. | Only relevant to a hand-rolled client — `sere publish` always sends the right shape. |
 | `429` | Rate limited. | The response carries `Retry-After` and `ratelimit-reset`. Back off and retry. |
 | `503` | Publishing or token checking is unavailable on the deployment. | Nothing to fix in your request. Retry later — if you run the deployment, `GET /api/registry/status` with a publish token reports the cause. |
 
@@ -245,7 +233,7 @@ Publishing answers with a specific reason, so start by reading it:
 | "That token has been revoked" / "has expired" | Expected: the credential was retired. Create a replacement. |
 | `503` with "could not check that token" | The deployment cannot reach its token table. The message names the cause — missing tables, a rejected key, or an unreachable database. `GET /api/registry/status` probes each dependency separately. |
 
-To check a token without publishing anything:
+`sere login <token>` runs exactly this check. To do it by hand without publishing anything:
 
 ```bash
 curl -s -X POST https://sere-lang.com/api/developers/tokens/verify \

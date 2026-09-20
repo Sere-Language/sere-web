@@ -30,7 +30,7 @@ async function Page() {
   return (
     <div className="flex gap-12">
       <article className="min-w-0 flex-1">
-        <DocMarkdown source={doc.content} />
+        <DocMarkdown source={doc.content} dir={doc.dir} />
         <DocsPager prev={null} next={next} />
       </article>
       <aside className="sticky top-20 hidden h-fit w-48 shrink-0 xl:block">

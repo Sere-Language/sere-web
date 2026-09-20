@@ -14,13 +14,9 @@ import PackageCard from "./PackageCard";
 
 interface PackageExplorerProps {
   packages: PackageSummary[];
-  registryConfigured: boolean;
 }
 
-export default function PackageExplorer({
-  packages,
-  registryConfigured,
-}: PackageExplorerProps) {
+export default function PackageExplorer({ packages }: PackageExplorerProps) {
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<PackageSort>(DEFAULT_PACKAGE_SORT);
 
@@ -123,7 +119,6 @@ export default function PackageExplorer({
         </div>
       ) : (
         <EmptyState
-          registryConfigured={registryConfigured}
           hasPackages={packages.length > 0}
           query={query.trim()}
           onClear={() => setQuery("")}
@@ -134,12 +129,10 @@ export default function PackageExplorer({
 }
 
 function EmptyState({
-  registryConfigured,
   hasPackages,
   query,
   onClear,
 }: {
-  registryConfigured: boolean;
   hasPackages: boolean;
   query: string;
   onClear: () => void;
@@ -163,33 +156,16 @@ function EmptyState({
     );
   }
 
-  if (!registryConfigured) {
-    return (
-      <div className="border-l-2 border-primary/50 py-0.5 pl-5">
-        <p className="m-0 mt-3 text-sm text-muted-foreground">
-          Nothing published yet. Packages uploaded to the registry show up here,
-          with their versions and install commands.
-        </p>
-        <Link href="/docs/publishing" className="text-sm text-primary no-underline">
-          How publishing works
-        </Link>
-      </div>
-    );
-  }
-
   return (
     <div className="border-l-2 border-primary/50 py-0.5 pl-5">
       <p className="m-0 mt-3 text-sm text-muted-foreground">
-        The registry is live and waiting for its first upload. Create a developer
-        account, issue a publish token, then push an archive:
+        No packages to list yet. Publish one and it appears here with its
+        versions and install command:
       </p>
       <pre className="well m-0 overflow-x-auto px-4 py-3 text-xs leading-6">
-        <code>{`curl -X POST https://sere-lang.com/api/packages \\
-  -H "Authorization: Bearer $SERE_TOKEN" \\
-  -F "name=hello-utils" \\
-  -F "version=0.1.0" \\
-  -F "summary=Small helpers" \\
-  -F tarball=@hello-utils-0.1.0.tar.gz`}</code>
+        <code>{`cd hello-utils          # the folder holding sere.toml
+sere login $SERE_TOKEN  # once per project
+sere publish`}</code>
       </pre>
       <Link href="/developers" className="text-sm text-primary no-underline">
         Create a developer account

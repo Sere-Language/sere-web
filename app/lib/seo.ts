@@ -88,12 +88,18 @@ export interface PageMetadataOptions {
   publishedTime?: string;
   modifiedTime?: string;
   authors?: string[];
+  /**
+   * Social card for pages that supply their own. Most pages rely on the
+   * `opengraph-image` file convention; the docs render theirs from a route
+   * handler because a catch-all segment cannot host that file.
+   */
+  images?: Array<{ url: string; width: number; height: number; alt?: string }>;
 }
 
 /**
  * Builds consistent per-page metadata: canonical URL, Open Graph, and Twitter
- * cards. Open Graph images are supplied by the `opengraph-image` file
- * conventions, so they are intentionally not hard-coded here.
+ * cards. Open Graph images come from the `opengraph-image` file conventions
+ * unless a page passes `images` of its own.
  */
 export function pageMetadata({
   title,
@@ -106,9 +112,11 @@ export function pageMetadata({
   publishedTime,
   modifiedTime,
   authors,
+  images,
 }: PageMetadataOptions): Metadata {
   const url = absoluteUrl(path);
   const trimmed = clampDescription(description);
+  const socialImages = images && images.length > 0 ? images : undefined;
 
   return {
     title: absoluteTitle ? { absolute: title } : title,
@@ -122,6 +130,7 @@ export function pageMetadata({
       url,
       siteName: SITE_NAME,
       locale: SITE_LOCALE,
+      ...(socialImages ? { images: socialImages } : {}),
       ...(ogType === "article"
         ? {
             ...(publishedTime ? { publishedTime } : {}),
@@ -134,6 +143,7 @@ export function pageMetadata({
       card: "summary_large_image",
       title,
       description: trimmed,
+      ...(socialImages ? { images: socialImages.map((image) => image.url) } : {}),
     },
     ...(noIndex
       ? { robots: { index: false, follow: true } }
