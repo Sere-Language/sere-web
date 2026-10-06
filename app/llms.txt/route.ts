@@ -11,6 +11,11 @@ const STATIC_LINKS: Array<{ title: string; path: string; note: string }> = [
     note: "Download the toolchain, put it on PATH, and compile a native binary.",
   },
   {
+    title: "Playground",
+    path: "/playground",
+    note: "Try Sere in the browser — compile and run snippets without installing.",
+  },
+  {
     title: "Docs",
     path: "/docs",
     note: "The language reference as the Sere compiler implements it.",

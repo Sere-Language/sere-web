@@ -28,6 +28,13 @@ const CONTENT_SECURITY_POLICY_HEADER = {
 const nextConfig: NextConfig = {
   // Don't advertise the framework on every response.
   poweredByHeader: false,
+  // The playground downloads and extracts the Sere toolchain at runtime into
+  // the OS temp directory. Keep that (and anything else in .sere-host) out of
+  // serverless function bundles — it is thousands of files and would blow past
+  // Vercel's size limits if traced.
+  outputFileTracingExcludes: {
+    "*": ["**/.sere-host/**"],
+  },
   redirects: async () => [
     {
       // Consolidate the www host onto the canonical apex domain.

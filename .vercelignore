@@ -1,0 +1,25 @@
+# Local toolchain cache — the playground downloads/extracts the Sere release
+# here at runtime. Never deploy it (it is hundreds of MB of native binaries).
+.sere-host
+
+# Local build output — Vercel builds remotely.
+.next
+
+# Dependencies and local project settings.
+node_modules
+.vercel
+
+# Offline example projects (not part of the site).
+sere-examples
+
+# Scratch / local-only files.
+build.log
+test-lsp.js
+image.png
+tsconfig.tsbuildinfo
+next-env.d.ts
+
+# Local environment files — configure secrets in the Vercel dashboard instead.
+.env
+.env.*
+!.env.example

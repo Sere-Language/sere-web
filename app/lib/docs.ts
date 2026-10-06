@@ -11,11 +11,39 @@ import {
   slugForDocPath,
 } from "./docLinks";
 
-const DOCS_DIR = path.join(process.cwd(), "content", "docs");
+const CONTENT_DIR = path.join(process.cwd(), "content");
+const DOCS_DIR = path.join(CONTENT_DIR, "docs");
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN ?? "";
 const GITHUB_TREE_API = `https://api.github.com/repos/${DOCS_REPO}/git/trees/${DOCS_REF}?recursive=1`;
+/** Raw markdown from the repository root. */
+const GITHUB_REPO_RAW_BASE = `https://raw.githubusercontent.com/${DOCS_REPO}/${DOCS_REF}/`;
 /** Raw markdown for the docs folder. Paths are docs-relative, so this prefix is required. */
-const GITHUB_DOCS_RAW_BASE = `https://raw.githubusercontent.com/${DOCS_REPO}/${DOCS_REF}/${REPO_DOCS_DIR}/`;
+const GITHUB_DOCS_RAW_BASE = `${GITHUB_REPO_RAW_BASE}${REPO_DOCS_DIR}/`;
+
+/**
+ * Docs pages that live outside the docs folder in the repository. The benchmark
+ * script rewrites `benchmark-results.md` at the repository root on every run, so
+ * it is fetched the same way the docs are and gets a Performance section of its own.
+ */
+const EXTERNAL_SOURCES: Array<{
+  slug: string;
+  repoPath: string;
+  section: string;
+  title: string;
+  description: string;
+  /** Checked-in copy used when GitHub cannot be reached. */
+  mirrorPath: string;
+}> = [
+    {
+      slug: "performance",
+      repoPath: "benchmark-results.md",
+      section: "performance",
+      title: "Benchmark results",
+      description:
+        "Sere against C and Python: runtime, memory usage, and binary size, measured by the repository's benchmark script.",
+      mirrorPath: path.join(CONTENT_DIR, "benchmark-results.md"),
+    },
+  ];
 
 /** How long a fetched copy of the repository docs is reused before refetching. */
 const SNAPSHOT_TTL_MS = 5 * 60 * 1000;
@@ -55,6 +83,15 @@ interface DocFile {
   path: string;
   content: string;
   lastModified: string | null;
+  /**
+   * Sidebar section for pages published from outside the docs folder, so they get
+   * their own group instead of being listed with the pages at the docs root.
+   */
+  section?: string;
+  /** Overrides the H1 for pages whose heading is not a good sidebar label. */
+  title?: string;
+  /** Overrides the first paragraph as the page description. */
+  description?: string;
 }
 
 interface DocsSnapshot {
@@ -206,6 +243,67 @@ function readLocalDocs(): DocFile[] {
   return files;
 }
 
+/**
+ * Downloads the pages listed in EXTERNAL_SOURCES from the repository root. They
+ * are fetched alongside the docs, so the Performance section follows the
+ * benchmark report without a redeploy.
+ */
+async function fetchExternalPages(): Promise<DocFile[]> {
+  const pages = await Promise.all(
+    EXTERNAL_SOURCES.map(async (source): Promise<DocFile | null> => {
+      try {
+        const response = await fetch(GITHUB_REPO_RAW_BASE + source.repoPath, {
+          headers: githubHeaders(),
+          next: { revalidate: 300 },
+        });
+        if (!response.ok) {
+          console.error(
+            `Docs: ${source.repoPath} is unavailable (GitHub returned ${response.status}).`,
+          );
+          return null;
+        }
+        return {
+          slug: source.slug,
+          path: source.repoPath,
+          section: source.section,
+          title: source.title,
+          description: source.description,
+          content: await response.text(),
+          lastModified: null,
+        };
+      } catch (error) {
+        console.error(
+          `Docs: could not download ${source.repoPath}: ${error instanceof Error ? error.message : "unknown error"}`,
+        );
+        return null;
+      }
+    }),
+  );
+
+  return pages.filter((page): page is DocFile => Boolean(page));
+}
+
+/** The checked-in copy of an external page, for when GitHub cannot be reached. */
+function readLocalExternalPages(): Map<string, DocFile> {
+  const pages = new Map<string, DocFile>();
+  for (const source of EXTERNAL_SOURCES) {
+    try {
+      pages.set(source.slug, {
+        slug: source.slug,
+        path: source.repoPath,
+        section: source.section,
+        title: source.title,
+        description: source.description,
+        content: fs.readFileSync(source.mirrorPath, "utf8"),
+        lastModified: null,
+      });
+    } catch {
+      // No mirror on disk, which is fine: the page just has no offline copy.
+    }
+  }
+  return pages;
+}
+
 function toFileMap(files: DocFile[]): Map<string, DocFile> {
   const map = new Map<string, DocFile>();
   for (const file of files) map.set(file.slug, file);
@@ -221,13 +319,23 @@ function toFileMap(files: DocFile[]): Map<string, DocFile> {
 async function buildSnapshot(): Promise<DocsSnapshot> {
   const files = toFileMap(readLocalDocs());
   const docPaths = await fetchGitHubDocPaths();
-  const remote = docPaths.length > 0 ? await fetchGitHubFiles(docPaths) : [];
+  const [remote, external] = await Promise.all([
+    docPaths.length > 0 ? fetchGitHubFiles(docPaths) : Promise.resolve<DocFile[]>([]),
+    fetchExternalPages(),
+  ]);
 
   for (const file of remote) files.set(file.slug, file);
 
+  const mirrors = readLocalExternalPages();
+  for (const source of EXTERNAL_SOURCES) {
+    const page =
+      external.find((candidate) => candidate.slug === source.slug) ?? mirrors.get(source.slug);
+    if (page) files.set(source.slug, page);
+  }
+
   return {
     files,
-    origin: remote.length > 0 ? "github" : "local",
+    origin: remote.length > 0 || external.length > 0 ? "github" : "local",
     fetchedAt: Date.now(),
   };
 }
@@ -301,9 +409,11 @@ function indexSlugForDir(files: Map<string, DocFile>, dir: string): string | nul
 }
 
 function compareByTitle(left: DocFile, right: DocFile): number {
-  return titleFromSource(left.content, left.slug).localeCompare(
-    titleFromSource(right.content, right.slug),
-  );
+  return titleOf(left).localeCompare(titleOf(right));
+}
+
+function titleOf(file: DocFile): string {
+  return file.title ?? titleFromSource(file.content, file.slug);
 }
 
 function isFolderIndex(file: DocFile): boolean {
@@ -329,7 +439,8 @@ function orderDocs(files: Map<string, DocFile>): DocFile[] {
   const orderedChildren = (dir: string): DocFile[] => {
     const indexSlug = indexSlugForDir(files, dir);
     const children = [...files.values()].filter(
-      (file) => dirForDocPath(file.path) === dir && file.slug !== indexSlug,
+      (file) =>
+        dirForDocPath(file.path) === dir && file.slug !== indexSlug && file.section === undefined,
     );
     const preferred = indexSlug
       ? docSlugsFromMarkdown(files.get(indexSlug)?.content ?? "", dir)
@@ -370,6 +481,8 @@ function orderDocs(files: Map<string, DocFile>): DocFile[] {
     const file = files.get(slug);
     if (file && isFolderIndex(file)) emit(slug);
   }
+  // Pages published from outside the docs folder get a section too.
+  for (const source of EXTERNAL_SOURCES) emit(source.slug);
   // Folders the index never mentions, and any other stragglers. A folder's index
   // page leads its folder even when nothing links to it.
   const stragglers = [...files.values()].sort((left, right) => {
@@ -385,12 +498,12 @@ function toEntry(file: DocFile): DocEntry {
   const dir = dirForDocPath(file.path);
   return {
     slug: file.slug,
-    title: titleFromSource(file.content, file.slug),
-    description: descriptionFromSource(file.content),
+    title: titleOf(file),
+    description: file.description ?? descriptionFromSource(file.content),
     href: hrefForSlug(file.slug),
     headings: headingsFromSource(file.content),
     lastModified: file.lastModified,
-    section: dir ? (dir.split("/")[0] ?? null) : null,
+    section: file.section ?? (dir ? (dir.split("/")[0] ?? null) : null),
     dir,
   };
 }
@@ -435,6 +548,20 @@ export async function syncDocsFromGitHub(): Promise<{ synced: number; errors: st
     } catch (error) {
       errors.push(
         `Failed to sync ${file.path}: ${error instanceof Error ? error.message : "unknown error"}`,
+      );
+    }
+  }
+
+  // Pages from outside the docs folder mirror next to content/docs, not inside it.
+  for (const page of await fetchExternalPages()) {
+    const source = EXTERNAL_SOURCES.find((candidate) => candidate.slug === page.slug);
+    if (!source) continue;
+    try {
+      fs.writeFileSync(source.mirrorPath, page.content, "utf8");
+      synced += 1;
+    } catch (error) {
+      errors.push(
+        `Failed to sync ${source.repoPath}: ${error instanceof Error ? error.message : "unknown error"}`,
       );
     }
   }

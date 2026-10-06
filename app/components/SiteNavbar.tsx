@@ -5,6 +5,7 @@ export default function SiteNavbar() {
   return (
     <Navbar>
       <NavbarButton href="/install">Install</NavbarButton>
+      <NavbarButton href="/playground">Playground</NavbarButton>
       <NavbarButton href="/docs">Docs</NavbarButton>
       <NavbarButton href="/libraries">Libraries</NavbarButton>
       <NavbarButton href="/issues">Issues</NavbarButton>
